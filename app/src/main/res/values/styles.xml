@@ -82,4 +82,12 @@
     <style name="ClearButtonStyle">
         <item name="android:tint">@color/text_gray</item>
     </style>
+
+    <style name="TrackLinearLayout">
+        <item name="android:background">@color/white</item>
+    </style>
+
+    <style name="TrackTitle">
+        <item name="android:textColor">@color/black</item>
+    </style>
 </resources>
