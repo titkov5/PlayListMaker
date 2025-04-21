@@ -18,7 +18,7 @@
         android:layout_marginBottom="@dimen/padding_8"
         android:src="@drawable/placeholder"
         android:scaleType="centerCrop"
-        app:cornerRadisus="2dp"
+        cornerRadisus="2dp"
         />
 
     <LinearLayout
