@@ -13,7 +13,7 @@
         android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
         tools:targetApi="31">
         <activity
-            android:name=".SearchActivity"
+            android:name=".Search.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".MediaActivity"
@@ -31,5 +31,6 @@
             </intent-filter>
         </activity>
     </application>
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest>

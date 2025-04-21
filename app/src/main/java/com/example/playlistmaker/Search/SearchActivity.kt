@@ -1,6 +1,5 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.Search
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -10,6 +9,10 @@ import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.MainActivity
+import com.example.playlistmaker.R
 import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
@@ -21,18 +24,14 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
         val searchTextEdit = findViewById<EditText>(R.id.search_edit_text)
         searchTextEdit.setText(currentText)
+
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
         clearButton.setOnClickListener {
             searchTextEdit.setText("")
-            val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(searchTextEdit.windowToken, 0)
         }
-
-        val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
-        toolbar.setNavigationOnClickListener {
-            val displayIntent = Intent(this, MainActivity::class.java)
-            startActivity(displayIntent)
-        }
+        setupToolBar()
 
         val searchTextWatcher = object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -49,6 +48,20 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         searchTextEdit.addTextChangedListener(searchTextWatcher)
+
+       val tracksView = findViewById<RecyclerView>(R.id.tracks_recycle_view)
+        tracksView.layoutManager = LinearLayoutManager(this)
+        tracksView.adapter = TrackAdapter(
+            tracks = TracksFactory.getTracks()
+        )
+    }
+
+    private fun setupToolBar() {
+        val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
+        toolbar.setNavigationOnClickListener {
+            val displayIntent = Intent(this, MainActivity::class.java)
+            startActivity(displayIntent)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
