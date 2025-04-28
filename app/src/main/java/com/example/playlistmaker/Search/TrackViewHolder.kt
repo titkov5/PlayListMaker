@@ -26,9 +26,9 @@ class TrackViewHolder(item: View): RecyclerView.ViewHolder(item) {
     }
 
     fun bind(model: Track) {
-        title.text = model.artistName
+        title.text = model.trackName
         val trackTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMillis)
-        subTitle.text = model.trackName + " \u2022 " + trackTime
+        subTitle.text = model.artistName + " \u2022 " + trackTime
         Glide
             .with(applicationContext)
             .load(model.artworkUrl100)

@@ -41,6 +41,7 @@
         <item name="android:backgroundTint">@color/white</item>
         <item name="android:textColorHint">@color/black</item>
         <item name="android:drawableTint">@color/black</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="ToolbarStyle">

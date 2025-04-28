@@ -83,8 +83,7 @@ class SearchActivity : AppCompatActivity() {
         val retryButton = findViewById<Button>(R.id.retry_button)
         retryButton.setOnClickListener {// TODO:
             NetworkService.findTracks(
-                searchTextEdit.text.toString(),
-                {findedTracks: List<Track> ->
+                searchTextEdit.text.toString(), { findedTracks: List<Track> ->
                     if (findedTracks.isNullOrEmpty()) {
                         tracksView.visibility = View.GONE
                         noConnectionView.visibility = View.GONE

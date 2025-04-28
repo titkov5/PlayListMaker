@@ -21,7 +21,7 @@
         android:layout_height="@dimen/height_52"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-         >
+        >
         <EditText
             android:id="@+id/search_edit_text"
             style="@style/TextEditStyle"
@@ -61,23 +61,23 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:visibility="gone"
         />
-<LinearLayout
-    android:id = "@+id/tracks_nothing_founded"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:visibility="gone"
-    >
-    <ImageView
-        style="@style/TrackSearch.Warn.Image.Noting"
-        />
-
-    <TextView
-        style="@style/ActivitySearch.Warn.Title.Theme"
-        android:text="@string/nothing_founded"
+    <LinearLayout
+        android:id = "@+id/tracks_nothing_founded"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
         >
-    </TextView>
-</LinearLayout>
+        <ImageView
+            style="@style/TrackSearch.Warn.Image.Noting"
+            />
+
+        <TextView
+            style="@style/ActivitySearch.Warn.Title.Theme"
+            android:text="@string/nothing_founded"
+            >
+        </TextView>
+    </LinearLayout>
 
     <LinearLayout
         android:id = "@+id/tracks_no_connection"
@@ -87,7 +87,7 @@
         android:visibility="visible"
         >
         <ImageView
-            style="@style/TrackSearch.Warn.Image.Noting"
+            style="@style/TrackSearch.Warn.Image.NoInternet"
             />
 
         <TextView

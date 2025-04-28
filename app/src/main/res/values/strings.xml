@@ -20,5 +20,5 @@
     <string name="androidRazrab">https://practicum.yandex.ru/android-developer/</string>
     <string name="nothing_founded">Ничего не нашлось</string>
     <string name="connection_issue">Проблемы со связью \n \n Загрузка не удалась. Проверьте \n подключение к интернету</string>
-
+<string name="itunes_base_url">https://itunes.apple.com/</string>
 </resources>
