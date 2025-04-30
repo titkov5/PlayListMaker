@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -47,6 +48,14 @@ class SettingsActivity : AppCompatActivity() {
             shareIntent.putExtra(Intent.EXTRA_TEXT, message)
             shareIntent.putExtra(Intent.EXTRA_SUBJECT,subject)
             startActivity(shareIntent)
+        }
+
+        val darkThemeSwithcer = findViewById<SwitchMaterial>(R.id.dark_them_swithcher)
+        darkThemeSwithcer.isChecked =  (applicationContext as App).darkTheme
+        darkThemeSwithcer.setOnCheckedChangeListener { swicher, checked ->
+            (applicationContext as App).switchTheme(checked)
+            val sharedPrefs = getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
+            sharedPrefs.edit().putBoolean(DARK_THEME_KEY, checked).apply()
         }
     }
 }
