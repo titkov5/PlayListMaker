@@ -4,36 +4,113 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.MainActivity
 import com.example.playlistmaker.R
+import com.example.playlistmaker.network.NetworkService
 import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
     private var currentText = ""
+    private lateinit var tracksView: RecyclerView
+    private lateinit var noConnectionView: LinearLayout
+    private lateinit var nothingFoundedView: LinearLayout
+    private lateinit var searchTextEdit: EditText
+    private lateinit var clearButton: ImageView
+    private lateinit var retryButton: Button
+
+    private var tracksAdapter = TrackAdapter(
+        tracks = TracksFactory.getTracks()
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_search)
-        val searchTextEdit = findViewById<EditText>(R.id.search_edit_text)
-        searchTextEdit.setText(currentText)
+        tracksView = findViewById(R.id.tracks_recycle_view)
+        tracksView.isVisible = false
 
-        val clearButton = findViewById<ImageView>(R.id.clearIcon)
+        noConnectionView = findViewById(R.id.tracks_no_connection)
+        noConnectionView.isVisible = false
+
+        nothingFoundedView = findViewById(R.id.tracks_nothing_founded)
+        nothingFoundedView.isVisible = false
+
+        searchTextEdit = findViewById<EditText>(R.id.search_edit_text)
+        searchTextEdit.setText(currentText)
+        searchTextEdit.setOnEditorActionListener { textView, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                NetworkService.findTracks(
+                    textView.text.toString(),
+                    { findedTracks: List<Track> ->
+                        if (findedTracks.isNullOrEmpty()) {
+                            tracksView.isVisible = false
+                            noConnectionView.isVisible = false
+                            nothingFoundedView.isVisible = true
+                        } else {
+                            tracksView.isVisible = true
+                            noConnectionView.isVisible = false
+                            nothingFoundedView.isVisible = false
+                        }
+                        tracksAdapter.tracks = findedTracks
+                        tracksView.adapter?.notifyDataSetChanged()
+                    },
+                    failureCompletion = { error: String ->
+                        tracksView.isVisible = false
+                        noConnectionView.isVisible = true
+                        nothingFoundedView.isVisible = false
+                    }
+                )
+                true
+            }
+            false
+        }
+
+        clearButton = findViewById(R.id.clearIcon)
         clearButton.setOnClickListener {
             searchTextEdit.setText("")
             val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(searchTextEdit.windowToken, 0)
+            tracksAdapter.tracks = emptyList()
+            tracksView.adapter?.notifyDataSetChanged()
         }
         setupToolBar()
 
-        val searchTextWatcher = object: TextWatcher {
+        retryButton = findViewById(R.id.retry_button)
+        retryButton.setOnClickListener {// TODO:
+            NetworkService.findTracks(
+                searchTextEdit.text.toString(), { findedTracks: List<Track> ->
+                    if (findedTracks.isNullOrEmpty()) {
+                        tracksView.visibility = View.GONE
+                        noConnectionView.visibility = View.GONE
+                        nothingFoundedView.visibility = View.VISIBLE
+                    } else {
+                        tracksView.visibility = View.VISIBLE
+                        noConnectionView.visibility = View.GONE
+                        nothingFoundedView.visibility = View.GONE
+                    }
+                    tracksAdapter.tracks = findedTracks
+                    tracksView.adapter?.notifyDataSetChanged()
+                },
+                failureCompletion = { error: String ->
+                    tracksView.visibility = View.GONE
+                    noConnectionView.visibility = View.VISIBLE
+                    nothingFoundedView.visibility = View.GONE
+                }
+            )
+        }
+
+        val searchTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 // empty
             }
@@ -48,12 +125,8 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         searchTextEdit.addTextChangedListener(searchTextWatcher)
-
-       val tracksView = findViewById<RecyclerView>(R.id.tracks_recycle_view)
         tracksView.layoutManager = LinearLayoutManager(this)
-        tracksView.adapter = TrackAdapter(
-            tracks = TracksFactory.getTracks()
-        )
+        tracksView.adapter = tracksAdapter
     }
 
     private fun setupToolBar() {
@@ -66,7 +139,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(SEARCH_REQUEST,currentText)
+        outState.putString(SEARCH_REQUEST, currentText)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
