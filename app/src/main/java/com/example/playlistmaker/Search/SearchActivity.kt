@@ -22,6 +22,12 @@ import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
     private var currentText = ""
+    private lateinit var tracksView: RecyclerView
+    private lateinit var noConnectionView: LinearLayout
+    private lateinit var nothingFoundedView: LinearLayout
+    private lateinit var searchTextEdit: EditText
+    private lateinit var clearButton: ImageView
+    private lateinit var retryButton: Button
 
     private var tracksAdapter = TrackAdapter(
         tracks = TracksFactory.getTracks()
@@ -31,38 +37,38 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_search)
-        val tracksView = findViewById<RecyclerView>(R.id.tracks_recycle_view)
-        tracksView.visibility = View.GONE
-        val noConnectionView = findViewById<LinearLayout>(R.id.tracks_no_connection)
-        noConnectionView.visibility = View.GONE
-        val nothingFoundedView = findViewById<LinearLayout>(R.id.tracks_nothing_founded)
-        nothingFoundedView.visibility = View.GONE
+        tracksView = findViewById(R.id.tracks_recycle_view)
+        tracksView.isVisible = false
 
-        val searchTextEdit = findViewById<EditText>(R.id.search_edit_text)
+        noConnectionView = findViewById(R.id.tracks_no_connection)
+        noConnectionView.isVisible = false
+
+        nothingFoundedView = findViewById(R.id.tracks_nothing_founded)
+        nothingFoundedView.isVisible = false
+
+        searchTextEdit = findViewById<EditText>(R.id.search_edit_text)
         searchTextEdit.setText(currentText)
         searchTextEdit.setOnEditorActionListener { textView, actionId, _ ->
-            true
-
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 NetworkService.findTracks(
                     textView.text.toString(),
-                    {findedTracks: List<Track> ->
+                    { findedTracks: List<Track> ->
                         if (findedTracks.isNullOrEmpty()) {
-                            tracksView.visibility = View.GONE
-                            noConnectionView.visibility = View.GONE
-                            nothingFoundedView.visibility = View.VISIBLE
+                            tracksView.isVisible = false
+                            noConnectionView.isVisible = false
+                            nothingFoundedView.isVisible = true
                         } else {
-                            tracksView.visibility = View.VISIBLE
-                            noConnectionView.visibility = View.GONE
-                            nothingFoundedView.visibility = View.GONE
+                            tracksView.isVisible = true
+                            noConnectionView.isVisible = false
+                            nothingFoundedView.isVisible = false
                         }
                         tracksAdapter.tracks = findedTracks
                         tracksView.adapter?.notifyDataSetChanged()
                     },
                     failureCompletion = { error: String ->
-                        tracksView.visibility = View.GONE
-                        noConnectionView.visibility = View.VISIBLE
-                        nothingFoundedView.visibility = View.GONE
+                        tracksView.isVisible = false
+                        noConnectionView.isVisible = true
+                        nothingFoundedView.isVisible = false
                     }
                 )
                 true
@@ -70,7 +76,7 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
-        val clearButton = findViewById<ImageView>(R.id.clearIcon)
+        clearButton = findViewById(R.id.clearIcon)
         clearButton.setOnClickListener {
             searchTextEdit.setText("")
             val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -80,7 +86,7 @@ class SearchActivity : AppCompatActivity() {
         }
         setupToolBar()
 
-        val retryButton = findViewById<Button>(R.id.retry_button)
+        retryButton = findViewById(R.id.retry_button)
         retryButton.setOnClickListener {// TODO:
             NetworkService.findTracks(
                 searchTextEdit.text.toString(), { findedTracks: List<Track> ->
@@ -104,7 +110,7 @@ class SearchActivity : AppCompatActivity() {
             )
         }
 
-        val searchTextWatcher = object: TextWatcher {
+        val searchTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 // empty
             }
@@ -133,7 +139,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(SEARCH_REQUEST,currentText)
+        outState.putString(SEARCH_REQUEST, currentText)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
