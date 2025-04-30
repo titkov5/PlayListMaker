@@ -16,6 +16,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.MainActivity
+import com.example.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
 import com.example.playlistmaker.R
 import com.example.playlistmaker.network.NetworkService
 import com.google.android.material.appbar.MaterialToolbar
@@ -28,10 +29,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchTextEdit: EditText
     private lateinit var clearButton: ImageView
     private lateinit var retryButton: Button
-
-    private var tracksAdapter = TrackAdapter(
-        tracks = TracksFactory.getTracks()
-    )
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var tracksAdapter: TrackAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +45,7 @@ class SearchActivity : AppCompatActivity() {
         nothingFoundedView = findViewById(R.id.tracks_nothing_founded)
         nothingFoundedView.isVisible = false
 
-        searchTextEdit = findViewById<EditText>(R.id.search_edit_text)
+        searchTextEdit = findViewById(R.id.search_edit_text)
         searchTextEdit.setText(currentText)
         searchTextEdit.setOnEditorActionListener { textView, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -75,6 +74,18 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         }
+        searchHistory = SearchHistory(
+            getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE),
+            this
+        )
+
+        tracksAdapter = TrackAdapter(
+            tracks = TracksFactory.getTracks(),
+            { track: Track -> searchHistory.addTrack(track) }
+        )
+        searchTextEdit.setOnFocusChangeListener { view, b ->
+            searchHistory.display()
+        }
 
         clearButton = findViewById(R.id.clearIcon)
         clearButton.setOnClickListener {
@@ -87,7 +98,7 @@ class SearchActivity : AppCompatActivity() {
         setupToolBar()
 
         retryButton = findViewById(R.id.retry_button)
-        retryButton.setOnClickListener {// TODO:
+        retryButton.setOnClickListener {
             NetworkService.findTracks(
                 searchTextEdit.text.toString(), { findedTracks: List<Track> ->
                     if (findedTracks.isNullOrEmpty()) {
@@ -118,6 +129,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 clearButton.isVisible = !p0.isNullOrEmpty()
                 currentText = p0.toString()
+                searchHistory.hide()
             }
 
             override fun afterTextChanged(p0: Editable?) {
