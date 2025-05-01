@@ -94,6 +94,7 @@ class SearchActivity : AppCompatActivity() {
             inputMethodManager.hideSoftInputFromWindow(searchTextEdit.windowToken, 0)
             tracksAdapter.tracks = emptyList()
             tracksView.adapter?.notifyDataSetChanged()
+            searchHistory.display()
         }
         setupToolBar()
 

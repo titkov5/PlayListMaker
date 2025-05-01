@@ -51,14 +51,17 @@ class SearchHistory(
     }
 
     fun addTrack(selectedTrack: Track) {
-        if (tracks.count() == 0) {
+        if (tracks.isEmpty()) {
             tracks.add(selectedTrack)
-        } else if (tracks.count() > 10) {
-            tracks.removeAt(tracks.lastIndex)
-        } else {
-            tracks.removeIf { it.trackId == selectedTrack.trackId}
-            tracks.add(0, selectedTrack)
         }
+
+        if (tracks.count() >= 10) {
+            tracks.removeAt(tracks.lastIndex)
+        }
+
+        tracks.removeIf { it.trackId == selectedTrack.trackId}
+        tracks.add(0, selectedTrack)
+
         save()
     }
 
