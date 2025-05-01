@@ -31,6 +31,10 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var retryButton: Button
     private lateinit var searchHistory: SearchHistory
     private lateinit var tracksAdapter: TrackAdapter
+    private lateinit var searchHistoryView: LinearLayout
+    private lateinit var historyClearButton: Button
+    private lateinit var historyTracksView: RecyclerView
+    private lateinit var historyTracksAdapter: TrackAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +48,7 @@ class SearchActivity : AppCompatActivity() {
 
         nothingFoundedView = findViewById(R.id.tracks_nothing_founded)
         nothingFoundedView.isVisible = false
+        searchHistoryView = findViewById(R.id.history_of_search)
 
         searchTextEdit = findViewById(R.id.search_edit_text)
         searchTextEdit.setText(currentText)
@@ -74,18 +79,15 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         }
-        searchHistory = SearchHistory(
-            getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE),
-            this
-        )
 
         tracksAdapter = TrackAdapter(
             tracks = TracksFactory.getTracks(),
-            { track: Track -> searchHistory.addTrack(track) }
+            { track: Track ->
+                searchHistory.addTrack(track)
+                historyTracksView.adapter?.notifyDataSetChanged()
+            }
         )
-        searchTextEdit.setOnFocusChangeListener { view, b ->
-            searchHistory.display()
-        }
+
 
         clearButton = findViewById(R.id.clearIcon)
         clearButton.setOnClickListener {
@@ -94,7 +96,7 @@ class SearchActivity : AppCompatActivity() {
             inputMethodManager.hideSoftInputFromWindow(searchTextEdit.windowToken, 0)
             tracksAdapter.tracks = emptyList()
             tracksView.adapter?.notifyDataSetChanged()
-            searchHistory.display()
+            searchHistoryView.isVisible = searchHistory.shouldDisplay()
         }
         setupToolBar()
 
@@ -130,7 +132,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 clearButton.isVisible = !p0.isNullOrEmpty()
                 currentText = p0.toString()
-                searchHistory.hide()
+                searchHistoryView.isVisible = false
             }
 
             override fun afterTextChanged(p0: Editable?) {
@@ -140,6 +142,30 @@ class SearchActivity : AppCompatActivity() {
         searchTextEdit.addTextChangedListener(searchTextWatcher)
         tracksView.layoutManager = LinearLayoutManager(this)
         tracksView.adapter = tracksAdapter
+
+        // History
+        searchHistory = SearchHistory(
+            getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
+        )
+        searchTextEdit.setOnFocusChangeListener { view, b ->
+            searchHistoryView.isVisible = searchHistory.shouldDisplay()
+        }
+
+        historyClearButton = findViewById(R.id.clear_history_button)
+        historyClearButton.setOnClickListener {
+            searchHistory.remove()
+            historyTracksAdapter.tracks = emptyList()
+            historyTracksView.adapter?.notifyDataSetChanged()
+            searchHistoryView.isVisible = false
+        }
+
+        historyTracksView = findViewById(R.id.history_tracks_recycle_view)
+        historyTracksView.layoutManager = LinearLayoutManager(this)
+        historyTracksAdapter = TrackAdapter(
+            searchHistory.tracks,
+            {}
+        )
+        historyTracksView.adapter = historyTracksAdapter
     }
 
     private fun setupToolBar() {
