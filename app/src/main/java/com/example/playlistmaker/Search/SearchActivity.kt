@@ -81,7 +81,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         tracksAdapter = TrackAdapter(
-            tracks = TracksFactory.getTracks(),
+            tracks = emptyList(),
             { track: Track ->
                 searchHistory.addTrack(track)
                 historyTracksView.adapter?.notifyDataSetChanged()
