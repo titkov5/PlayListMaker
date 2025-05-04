@@ -2,11 +2,12 @@ package com.example.playlistmaker.Search
 
 class TracksFactory {
     companion object {
-        fun getTracks(): List<Track> {
+        fun getTracks(): MutableList<Track> {
             val tracks = mutableListOf<Track>()
 
             tracks.add(
                 Track(
+                    "1",
                     "Smells Like Teen Spirit",
                     "Nirvana",
                     100,
@@ -17,6 +18,7 @@ class TracksFactory {
 
             tracks.add(
                 Track(
+                    "2",
                     "Billie Jean",
                     "Michael Jackson",
                     100,
@@ -27,6 +29,7 @@ class TracksFactory {
 
             tracks.add(
                 Track(
+                    "3",
                     "Stayin' Alive",
                     "Bee Gees",
                     100,
@@ -37,6 +40,7 @@ class TracksFactory {
 
             tracks.add(
                 Track(
+                    "4",
                     "Stayin' Alive",
                     "Bee Gees",
                     100,
@@ -47,6 +51,7 @@ class TracksFactory {
 
             tracks.add(
                 Track(
+                    "5",
                     "Whole Lotta Love",
                     "Led Zeppelin",
                     100,
@@ -57,6 +62,7 @@ class TracksFactory {
 
             tracks.add(
                 Track(
+                    "6",
                     "Sweet Child O'Mine",
                     "Guns N' Roses",
                     100,

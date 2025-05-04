@@ -21,4 +21,6 @@
     <string name="nothing_founded">Ничего не нашлось</string>
     <string name="connection_issue">Проблемы со связью \n \n Загрузка не удалась. Проверьте \n подключение к интернету</string>
     <string name="itunes_base_url">https://itunes.apple.com/</string>
+    <string name="your_search_history">Вы искали</string>
+    <string name="clear_history_button">Очистить историю</string>
 </resources>

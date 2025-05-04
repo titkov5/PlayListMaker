@@ -54,6 +54,38 @@
             style="@style/ClearButtonStyle"
             />
     </FrameLayout>
+
+    <LinearLayout
+        android:id = "@+id/history_of_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        >
+        <TextView
+            style="@style/ActivitySearch.Warn.Title.Theme"
+            android:text="@string/your_search_history"
+            android:layout_marginTop="42dp"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="center_horizontal"
+            >
+        </TextView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id = "@+id/history_tracks_recycle_view"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            />
+
+        <Button
+            android:id="@+id/clear_history_button"
+            style="@style/TrackSearch.Warn.Button.Retry.Theme"
+            android:text="@string/clear_history_button"
+            android:layout_marginTop="@dimen/padding_24"
+            />
+    </LinearLayout>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id = "@+id/tracks_recycle_view"
         android:layout_width="match_parent"
@@ -61,6 +93,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:visibility="gone"
         />
+
     <LinearLayout
         android:id = "@+id/tracks_nothing_founded"
         android:layout_width="match_parent"
@@ -84,7 +117,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="visible"
+        android:visibility="gone"
         >
         <ImageView
             style="@style/TrackSearch.Warn.Image.NoInternet"

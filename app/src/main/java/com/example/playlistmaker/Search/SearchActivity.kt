@@ -16,6 +16,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.MainActivity
+import com.example.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
 import com.example.playlistmaker.R
 import com.example.playlistmaker.network.NetworkService
 import com.google.android.material.appbar.MaterialToolbar
@@ -28,10 +29,12 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchTextEdit: EditText
     private lateinit var clearButton: ImageView
     private lateinit var retryButton: Button
-
-    private var tracksAdapter = TrackAdapter(
-        tracks = TracksFactory.getTracks()
-    )
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var tracksAdapter: TrackAdapter
+    private lateinit var searchHistoryView: LinearLayout
+    private lateinit var historyClearButton: Button
+    private lateinit var historyTracksView: RecyclerView
+    private lateinit var historyTracksAdapter: TrackAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +48,9 @@ class SearchActivity : AppCompatActivity() {
 
         nothingFoundedView = findViewById(R.id.tracks_nothing_founded)
         nothingFoundedView.isVisible = false
+        searchHistoryView = findViewById(R.id.history_of_search)
 
-        searchTextEdit = findViewById<EditText>(R.id.search_edit_text)
+        searchTextEdit = findViewById(R.id.search_edit_text)
         searchTextEdit.setText(currentText)
         searchTextEdit.setOnEditorActionListener { textView, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -76,6 +80,15 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
+        tracksAdapter = TrackAdapter(
+            tracks = TracksFactory.getTracks(),
+            { track: Track ->
+                searchHistory.addTrack(track)
+                historyTracksView.adapter?.notifyDataSetChanged()
+            }
+        )
+
+
         clearButton = findViewById(R.id.clearIcon)
         clearButton.setOnClickListener {
             searchTextEdit.setText("")
@@ -83,11 +96,12 @@ class SearchActivity : AppCompatActivity() {
             inputMethodManager.hideSoftInputFromWindow(searchTextEdit.windowToken, 0)
             tracksAdapter.tracks = emptyList()
             tracksView.adapter?.notifyDataSetChanged()
+            searchHistoryView.isVisible = searchHistory.shouldDisplay()
         }
         setupToolBar()
 
         retryButton = findViewById(R.id.retry_button)
-        retryButton.setOnClickListener {// TODO:
+        retryButton.setOnClickListener {
             NetworkService.findTracks(
                 searchTextEdit.text.toString(), { findedTracks: List<Track> ->
                     if (findedTracks.isNullOrEmpty()) {
@@ -118,6 +132,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 clearButton.isVisible = !p0.isNullOrEmpty()
                 currentText = p0.toString()
+                searchHistoryView.isVisible = false
             }
 
             override fun afterTextChanged(p0: Editable?) {
@@ -127,6 +142,30 @@ class SearchActivity : AppCompatActivity() {
         searchTextEdit.addTextChangedListener(searchTextWatcher)
         tracksView.layoutManager = LinearLayoutManager(this)
         tracksView.adapter = tracksAdapter
+
+        // History
+        searchHistory = SearchHistory(
+            getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
+        )
+        searchTextEdit.setOnFocusChangeListener { view, b ->
+            searchHistoryView.isVisible = searchHistory.shouldDisplay()
+        }
+
+        historyClearButton = findViewById(R.id.clear_history_button)
+        historyClearButton.setOnClickListener {
+            searchHistory.remove()
+            historyTracksAdapter.tracks = emptyList()
+            historyTracksView.adapter?.notifyDataSetChanged()
+            searchHistoryView.isVisible = false
+        }
+
+        historyTracksView = findViewById(R.id.history_tracks_recycle_view)
+        historyTracksView.layoutManager = LinearLayoutManager(this)
+        historyTracksAdapter = TrackAdapter(
+            searchHistory.tracks,
+            {}
+        )
+        historyTracksView.adapter = historyTracksAdapter
     }
 
     private fun setupToolBar() {
