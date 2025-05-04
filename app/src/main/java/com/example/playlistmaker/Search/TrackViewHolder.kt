@@ -19,9 +19,9 @@ class TrackViewHolder(item: View): RecyclerView.ViewHolder(item) {
     private val applicationContext: View
 
     init {
-        title = item.findViewById<TextView>(R.id.track_cell_title)
-        subTitle = item.findViewById<TextView>(R.id.track_cell_sub_title)
-        image = item.findViewById<ImageView>(R.id.track_cell_image)
+        title = item.findViewById(R.id.track_cell_title)
+        subTitle = item.findViewById(R.id.track_cell_sub_title)
+        image = item.findViewById(R.id.track_cell_image)
         applicationContext = item
     }
 
