@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    tools:context=".PlayerActivity"
     >
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/playerToolbar"
-        style="@style/ToolbarStyle"
-        app:navigationIcon="@drawable/arrow_back" />
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="0dp"
     android:layout_weight="1"
-    tools:context=".PlayerActivity">
+    >
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/playerToolbar"
+        style="@style/ToolbarStyle"
+        app:navigationIcon="@drawable/arrow_back" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/leftBorder"
@@ -31,7 +32,6 @@
         app:layout_constraintGuide_end="@dimen/padding_24"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-
     <ImageView
         android:id="@+id/cover"
         android:layout_width="0dp"
@@ -128,7 +128,10 @@
         android:layout_marginTop="@dimen/padding_40"
         app:layout_constraintEnd_toEndOf="@+id/rightBorder"
         app:layout_constraintTop_toBottomOf="@+id/trackTimeCurrentValue"
-        android:text="0:00" />
+        android:text="0:00"
+        android:ellipsize="end"
+        android:maxLines="1"
+        />
 
     <TextView
         android:id="@+id/trackAlbumTitle"
@@ -148,7 +151,11 @@
         app:layout_constraintEnd_toEndOf="@+id/rightBorder"
         android:layout_marginTop="@dimen/padding_8"
         app:layout_constraintTop_toBottomOf="@+id/trackTimeValue"
-        android:text="Акустический альбом" />
+        android:text="Акустический альбом"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintWidth_max="100dp"
+        />
 
     <TextView
         android:id="@+id/trackYearTitle"
@@ -168,7 +175,10 @@
         app:layout_constraintEnd_toEndOf="@+id/rightBorder"
         android:layout_marginTop="@dimen/padding_8"
         app:layout_constraintTop_toBottomOf="@+id/trackAlbumTitle"
-        android:text="2024" />
+        android:text="2024"
+        android:ellipsize="end"
+        android:maxLines="1"
+        />
 
     <TextView
         android:id="@+id/trackGanreTitle"
@@ -188,7 +198,10 @@
         app:layout_constraintEnd_toEndOf="@+id/rightBorder"
         android:layout_marginTop="@dimen/padding_8"
         app:layout_constraintTop_toBottomOf="@+id/trackYearValue"
-        android:text="Рок-н-Ролл" />
+        android:text="Рок-н-Ролл"
+        android:ellipsize="end"
+        android:maxLines="1"
+        />
 
     <TextView
         android:id="@+id/trackCountryTitle"
@@ -198,7 +211,10 @@
         app:layout_constraintStart_toEndOf="@+id/leftBorder"
         app:layout_constraintTop_toBottomOf="@+id/trackGanreTitle"
         android:layout_marginTop="@dimen/padding_8"
-        android:text="@string/track_country_title" />
+        android:layout_marginBottom="@dimen/padding_20"
+        android:text="@string/track_country_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 
     <TextView
         android:id="@+id/trackCountryTitleValue"
@@ -208,7 +224,10 @@
         app:layout_constraintEnd_toEndOf="@+id/rightBorder"
         android:layout_marginTop="@dimen/padding_8"
         app:layout_constraintTop_toBottomOf="@+id/trackGanreValue"
-        android:text="Россия" />
+        android:text="Россия"
+        android:ellipsize="end"
+        android:maxLines="1"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-</LinearLayout>
+</ScrollView>

@@ -44,7 +44,8 @@ class PlayerActivity : AppCompatActivity() {
             trackAlumTextView.text = track.collectionName
 
             val trackYearTextView = findViewById<TextView>(R.id.trackYearValue)
-            trackYearTextView.text = track.releaseDate
+            val releaseDate = SimpleDateFormat("yyyy", Locale.getDefault()).format(track.trackTimeMillis)
+            trackYearTextView.text = releaseDate
 
             val trackGanreTextView = findViewById<TextView>(R.id.trackGanreValue)
             trackGanreTextView.text = track.primaryGenreName
