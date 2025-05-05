@@ -16,7 +16,7 @@
         android:layout_marginTop="@dimen/padding_8"
         android:layout_marginStart="@dimen/padding_13"
         android:layout_marginBottom="@dimen/padding_8"
-        android:src="@drawable/placeholder"
+        android:src="@drawable/track_placeholder"
         android:scaleType="centerCrop"
         cornerRadisus="2dp"
         />

@@ -32,7 +32,7 @@ class TrackViewHolder(item: View): RecyclerView.ViewHolder(item) {
         Glide
             .with(applicationContext)
             .load(model.artworkUrl100)
-            .placeholder(R.drawable.placeholder)
+            .placeholder(R.drawable.track_placeholder)
             .transform(RoundedCorners(dpToPx(2.toFloat(), applicationContext.context)))
             .into(image)
     }
