@@ -16,8 +16,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener {
-            val displayIntent = Intent(this, MainActivity::class.java)
-            startActivity(displayIntent)
+            finish()
         }
 
         val agreement = findViewById<TextView>(R.id.userAgreement)

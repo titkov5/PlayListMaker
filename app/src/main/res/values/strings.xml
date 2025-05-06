@@ -23,4 +23,13 @@
     <string name="itunes_base_url">https://itunes.apple.com/</string>
     <string name="your_search_history">Вы искали</string>
     <string name="clear_history_button">Очистить историю</string>
+    <!-- Player -->
+    <string name="track_time_title">Длительность</string>
+    <string name="track_album_title">Альбом</string>
+    <string name="track_year_title">Год</string>
+    <string name="track_ganre_title">Жанр</string>
+    <string name="track_country_title">Страна</string>
+
+    <string name="track_name_placeholder">Название трека</string>
+    <string name="track_singer_placeholder">исполнитель</string>
 </resources>

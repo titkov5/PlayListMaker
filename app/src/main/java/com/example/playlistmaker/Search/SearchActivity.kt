@@ -1,6 +1,7 @@
 package com.example.playlistmaker.Search
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,9 +18,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.MainActivity
 import com.example.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
+import com.example.playlistmaker.PlayerActivity
 import com.example.playlistmaker.R
 import com.example.playlistmaker.network.NetworkService
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.gson.Gson
 
 class SearchActivity : AppCompatActivity() {
     private var currentText = ""
@@ -81,10 +84,14 @@ class SearchActivity : AppCompatActivity() {
         }
 
         tracksAdapter = TrackAdapter(
-            tracks = TracksFactory.getTracks(),
+            tracks = emptyList(),
             { track: Track ->
                 searchHistory.addTrack(track)
                 historyTracksView.adapter?.notifyDataSetChanged()
+                val displayTrackIntent = Intent(this, PlayerActivity::class.java)
+                val trackAsString = Gson().toJson(track)
+                displayTrackIntent.putExtra("Track", trackAsString)
+                startActivity(displayTrackIntent)
             }
         )
 
@@ -163,7 +170,12 @@ class SearchActivity : AppCompatActivity() {
         historyTracksView.layoutManager = LinearLayoutManager(this)
         historyTracksAdapter = TrackAdapter(
             searchHistory.tracks,
-            {}
+            { track: Track ->
+                val displayTrackIntent = Intent(this, PlayerActivity::class.java)
+                val trackAsString = Gson().toJson(track)
+                displayTrackIntent.putExtra("Track", trackAsString)
+                startActivity(displayTrackIntent)
+            }
         )
         historyTracksView.adapter = historyTracksAdapter
     }

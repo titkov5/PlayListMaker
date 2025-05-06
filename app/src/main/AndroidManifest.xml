@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
-        android:name="com.example.playlistmaker.App"
+        android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -13,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
         tools:targetApi="31">
+        <activity
+            android:name=".PlayerActivity"
+            android:exported="false" />
         <activity
             android:name=".Search.SearchActivity"
             android:exported="false" />
@@ -27,10 +33,10 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
 </manifest>
