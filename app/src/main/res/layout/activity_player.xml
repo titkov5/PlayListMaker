@@ -154,7 +154,7 @@
         android:text="Акустический альбом"
         android:ellipsize="end"
         android:maxLines="1"
-        app:layout_constraintWidth_max="100dp"
+        app:layout_constraintWidth_max="150dp"
         />
 
     <TextView

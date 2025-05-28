@@ -1,6 +1,5 @@
 package com.example.playlistmaker
 
-import android.content.Context
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.util.TypedValue
@@ -12,6 +11,8 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.Search.Track
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
@@ -44,8 +45,10 @@ class PlayerActivity : AppCompatActivity() {
             trackAlumTextView.text = track.collectionName
 
             val trackYearTextView = findViewById<TextView>(R.id.trackYearValue)
-            val releaseDate = SimpleDateFormat("yyyy", Locale.getDefault()).format(track.trackTimeMillis)
-            trackYearTextView.text = releaseDate
+
+            val release = SimpleDateFormat("yyyy", Locale.getDefault()).parse(track.releaseDate)
+
+            trackYearTextView.text = release.toString()
 
             val trackGanreTextView = findViewById<TextView>(R.id.trackGanreValue)
             trackGanreTextView.text = track.primaryGenreName
