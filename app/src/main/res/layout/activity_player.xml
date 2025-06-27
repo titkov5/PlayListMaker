@@ -66,7 +66,6 @@
         android:text="@string/track_singer_placeholder"/>
     <ImageView
         android:id="@+id/icon_play"
-        style="@style/PlayerPlay"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="@dimen/padding_28"

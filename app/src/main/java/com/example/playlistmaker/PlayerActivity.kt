@@ -1,7 +1,10 @@
 package com.example.playlistmaker
 
 import android.icu.text.SimpleDateFormat
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.TypedValue
 import android.widget.ImageView
 import android.widget.TextView
@@ -11,11 +14,16 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.Search.Track
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
+
+    private var mediaPlayer = MediaPlayer()
+    private lateinit var playImageView: ImageView
+    private lateinit var trackTimeTextView: TextView
+    private var playerState = STATE_DEFAULT
+    private val handler = Handler(Looper.getMainLooper())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -24,6 +32,12 @@ class PlayerActivity : AppCompatActivity() {
         val toolbar = findViewById<MaterialToolbar>(R.id.playerToolbar)
         toolbar.setNavigationOnClickListener {
             finish()
+        }
+
+        playImageView = findViewById<ImageView>(R.id.icon_play)
+
+        playImageView.setOnClickListener {
+            playPause()
         }
 
         val extras = intent.extras
@@ -37,10 +51,8 @@ class PlayerActivity : AppCompatActivity() {
             val trackArtistTextView = findViewById<TextView>(R.id.track_subtitle)
             trackArtistTextView.text = track.artistName
 
-            val trackTimeTextView = findViewById<TextView>(R.id.trackTimeValue)
-            val trackTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
-            trackTimeTextView.text = trackTime
-
+            trackTimeTextView = findViewById<TextView>(R.id.trackTimeCurrentValue)
+            resetCurrentTime()
             val trackAlumTextView = findViewById<TextView>(R.id.trackAlbumValue)
             trackAlumTextView.text = track.collectionName
 
@@ -64,7 +76,76 @@ class PlayerActivity : AppCompatActivity() {
                 .placeholder(R.drawable.track_placeholder)
                 .transform(RoundedCorners(dpToPx(8.toFloat())))
                 .into(cover)
+
+            prepareMediaPlayer(track.previewUrl)
         }
+    }
+
+    private fun resetCurrentTime() {
+        trackTimeTextView.text = "00:00"
+    }
+
+    private fun updateTrackTime() {
+        handler.postDelayed( {
+            val currentPosition = mediaPlayer.currentPosition
+            trackTimeTextView.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(currentPosition)
+            updateTrackTime()
+        },
+            REFRESH_TIME_DELAY
+        )
+    }
+
+    fun prepareMediaPlayer(url: String) {
+        mediaPlayer.setDataSource(url)
+        mediaPlayer.prepareAsync()
+
+        mediaPlayer.setOnPreparedListener {
+            playerState = STATE_PREPARED
+        }
+
+        mediaPlayer.setOnCompletionListener {
+            handler.removeCallbacksAndMessages(null)
+            resetCurrentTime()
+            mediaPlayer.seekTo(0)
+            playerState = STATE_PREPARED
+            playImageView.setImageResource(R.drawable.play )
+        }
+    }
+
+    fun startPlayer() {
+        updateTrackTime()
+        mediaPlayer.start()
+        playerState = STATE_PLAYING
+        playImageView.setImageResource(R.drawable.pause)
+    }
+
+    fun pausePlayer() {
+        handler.removeCallbacksAndMessages(null)
+        mediaPlayer.pause()
+        playerState = STATE_PAUSED
+        playImageView.setImageResource(R.drawable.play)
+    }
+
+    fun playPause() {
+        when(playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+        handler.removeCallbacksAndMessages(null)
     }
 
     fun dpToPx(dp: Float): Int {
@@ -72,5 +153,13 @@ class PlayerActivity : AppCompatActivity() {
             TypedValue.COMPLEX_UNIT_DIP,
             dp,
             applicationContext.resources.displayMetrics).toInt()
+    }
+
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+        private const val REFRESH_TIME_DELAY = 300L
     }
 }

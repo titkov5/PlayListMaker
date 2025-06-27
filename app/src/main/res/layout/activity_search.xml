@@ -55,6 +55,13 @@
             />
     </FrameLayout>
 
+    <ProgressBar android:id="@+id/progressBar"
+        style="@style/ProgressBarStyle"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:id = "@+id/history_of_search"
         android:layout_width="match_parent"

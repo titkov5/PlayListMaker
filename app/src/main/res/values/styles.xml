@@ -172,7 +172,7 @@
     </style>
 
     <style name="PlayerPlay">
-        <item name="android:src">@drawable/play_light</item>
+        <item name="android:src">@drawable/play</item>
     </style>
 
     <style name="PlayerAdd">
@@ -181,6 +181,10 @@
 
     <style name="PlayerLike">
         <item name="android:src">@drawable/like_light</item>
+    </style>
+
+    <style name="ProgressBarStyle">
+        <item name="android:indeterminateTint">@color/black</item>
     </style>
 
 </resources>

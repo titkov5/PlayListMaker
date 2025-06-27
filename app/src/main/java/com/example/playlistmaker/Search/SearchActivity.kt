@@ -3,15 +3,17 @@ package com.example.playlistmaker.Search
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +31,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var tracksView: RecyclerView
     private lateinit var noConnectionView: LinearLayout
     private lateinit var nothingFoundedView: LinearLayout
+    private lateinit var progressBar: ProgressBar
     private lateinit var searchTextEdit: EditText
     private lateinit var clearButton: ImageView
     private lateinit var retryButton: Button
@@ -38,6 +41,10 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyClearButton: Button
     private lateinit var historyTracksView: RecyclerView
     private lateinit var historyTracksAdapter: TrackAdapter
+    private var isClickAllowed = true
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { searchRequest() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,46 +62,22 @@ class SearchActivity : AppCompatActivity() {
 
         searchTextEdit = findViewById(R.id.search_edit_text)
         searchTextEdit.setText(currentText)
-        searchTextEdit.setOnEditorActionListener { textView, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                NetworkService.findTracks(
-                    textView.text.toString(),
-                    { findedTracks: List<Track> ->
-                        if (findedTracks.isNullOrEmpty()) {
-                            tracksView.isVisible = false
-                            noConnectionView.isVisible = false
-                            nothingFoundedView.isVisible = true
-                        } else {
-                            tracksView.isVisible = true
-                            noConnectionView.isVisible = false
-                            nothingFoundedView.isVisible = false
-                        }
-                        tracksAdapter.tracks = findedTracks
-                        tracksView.adapter?.notifyDataSetChanged()
-                    },
-                    failureCompletion = { error: String ->
-                        tracksView.isVisible = false
-                        noConnectionView.isVisible = true
-                        nothingFoundedView.isVisible = false
-                    }
-                )
-                true
-            }
-            false
-        }
+
+        progressBar = findViewById(R.id.progressBar)
 
         tracksAdapter = TrackAdapter(
             tracks = emptyList(),
             { track: Track ->
-                searchHistory.addTrack(track)
-                historyTracksView.adapter?.notifyDataSetChanged()
-                val displayTrackIntent = Intent(this, PlayerActivity::class.java)
-                val trackAsString = Gson().toJson(track)
-                displayTrackIntent.putExtra("Track", trackAsString)
-                startActivity(displayTrackIntent)
+                if (clickDebounce()) {
+                    searchHistory.addTrack(track)
+                    historyTracksView.adapter?.notifyDataSetChanged()
+                    val displayTrackIntent = Intent(this, PlayerActivity::class.java)
+                    val trackAsString = Gson().toJson(track)
+                    displayTrackIntent.putExtra("Track", trackAsString)
+                    startActivity(displayTrackIntent)
+                }
             }
         )
-
 
         clearButton = findViewById(R.id.clearIcon)
         clearButton.setOnClickListener {
@@ -109,26 +92,7 @@ class SearchActivity : AppCompatActivity() {
 
         retryButton = findViewById(R.id.retry_button)
         retryButton.setOnClickListener {
-            NetworkService.findTracks(
-                searchTextEdit.text.toString(), { findedTracks: List<Track> ->
-                    if (findedTracks.isNullOrEmpty()) {
-                        tracksView.visibility = View.GONE
-                        noConnectionView.visibility = View.GONE
-                        nothingFoundedView.visibility = View.VISIBLE
-                    } else {
-                        tracksView.visibility = View.VISIBLE
-                        noConnectionView.visibility = View.GONE
-                        nothingFoundedView.visibility = View.GONE
-                    }
-                    tracksAdapter.tracks = findedTracks
-                    tracksView.adapter?.notifyDataSetChanged()
-                },
-                failureCompletion = { error: String ->
-                    tracksView.visibility = View.GONE
-                    noConnectionView.visibility = View.VISIBLE
-                    nothingFoundedView.visibility = View.GONE
-                }
-            )
+            searchRequest()
         }
 
         val searchTextWatcher = object : TextWatcher {
@@ -140,6 +104,8 @@ class SearchActivity : AppCompatActivity() {
                 clearButton.isVisible = !p0.isNullOrEmpty()
                 currentText = p0.toString()
                 searchHistoryView.isVisible = false
+
+                searchDebounce()
             }
 
             override fun afterTextChanged(p0: Editable?) {
@@ -200,7 +166,56 @@ class SearchActivity : AppCompatActivity() {
         searchTextEdit.setText(currentText)
     }
 
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun searchRequest() {
+        val searchText = searchTextEdit.text.toString()
+        if (searchText.length > 2) {
+            progressBar.isVisible = true
+            NetworkService.findTracks(
+                searchText,
+                { findedTracks: List<Track> ->
+                    if (findedTracks.isNullOrEmpty()) {
+                        setUpViewWith(SearchStatus.Empty)
+                    } else {
+                        setUpViewWith(SearchStatus.Success)
+                    }
+                    tracksAdapter.tracks = findedTracks
+                    tracksView.adapter?.notifyDataSetChanged()
+                },
+                failureCompletion = { error: String ->
+                    setUpViewWith(SearchStatus.Failed)
+                }
+            )
+        }
+    }
+
+    private fun setUpViewWith(status: SearchStatus) {
+        progressBar.isVisible = false
+        tracksView.isVisible = status == SearchStatus.Success
+        noConnectionView.isVisible = status == SearchStatus.Failed
+        nothingFoundedView.isVisible = status == SearchStatus.Empty
+    }
+
     companion object {
         const val SEARCH_REQUEST = "SEARCH_TEXT"
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
+}
+
+enum class SearchStatus {
+    Empty, Success,Failed
 }
