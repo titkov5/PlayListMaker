@@ -99,10 +99,6 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="PlayerPlay">
-        <item name="android:src">@drawable/play_night</item>
-    </style>
-
     <style name="PlayerAdd">
         <item name="android:src">@drawable/add_dark</item>
     </style>
@@ -113,6 +109,14 @@
 
     <style name="ProgressBarStyle">
         <item name="android:indeterminateTint">@color/white</item>
+    </style>
+
+    <style name="PlayerPlay">
+        <item name="android:src">@drawable/play_night</item>
+    </style>
+
+    <style name="PlayerPause">
+        <item name="android:src">@drawable/pause_night</item>
     </style>
 
 </resources>

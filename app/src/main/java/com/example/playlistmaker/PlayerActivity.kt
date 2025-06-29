@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -34,8 +35,7 @@ class PlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        playImageView = findViewById<ImageView>(R.id.icon_play)
-
+        playImageView = findViewById(R.id.icon_play)
         playImageView.setOnClickListener {
             playPause()
         }
@@ -116,14 +116,29 @@ class PlayerActivity : AppCompatActivity() {
         updateTrackTime()
         mediaPlayer.start()
         playerState = STATE_PLAYING
-        playImageView.setImageResource(R.drawable.pause)
+        if (isDarkMode()) {
+            playImageView.setImageResource(R.drawable.pause_night)
+        } else {
+            playImageView.setImageResource(R.drawable.pause)
+        }
     }
 
     fun pausePlayer() {
         handler.removeCallbacksAndMessages(null)
         mediaPlayer.pause()
         playerState = STATE_PAUSED
-        playImageView.setImageResource(R.drawable.play)
+        if (isDarkMode()) {
+            playImageView.setImageResource(R.drawable.play_night)
+        } else {
+            playImageView.setImageResource(R.drawable.play)
+        }
+    }
+
+    fun isDarkMode(): Boolean {
+        return when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
     }
 
     fun playPause() {
