@@ -22,7 +22,7 @@ class PlayerActivity : AppCompatActivity() {
     private var mediaPlayer = MediaPlayer()
     private lateinit var playImageView: ImageView
     private lateinit var trackTimeTextView: TextView
-    private var playerState = STATE_DEFAULT
+    private var playerState = PlaybackState.Default
     private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,27 +95,27 @@ class PlayerActivity : AppCompatActivity() {
         )
     }
 
-    fun prepareMediaPlayer(url: String) {
+    private fun prepareMediaPlayer(url: String) {
         mediaPlayer.setDataSource(url)
         mediaPlayer.prepareAsync()
 
         mediaPlayer.setOnPreparedListener {
-            playerState = STATE_PREPARED
+            playerState = PlaybackState.Prepared
         }
 
         mediaPlayer.setOnCompletionListener {
             handler.removeCallbacksAndMessages(null)
             resetCurrentTime()
             mediaPlayer.seekTo(0)
-            playerState = STATE_PREPARED
+            playerState = PlaybackState.Prepared
             playImageView.setImageResource(R.drawable.play )
         }
     }
 
-    fun startPlayer() {
+    private fun startPlayer() {
         updateTrackTime()
         mediaPlayer.start()
-        playerState = STATE_PLAYING
+        playerState =  PlaybackState.Playing
         if (isDarkMode()) {
             playImageView.setImageResource(R.drawable.pause_night)
         } else {
@@ -123,10 +123,10 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    fun pausePlayer() {
+    private fun pausePlayer() {
         handler.removeCallbacksAndMessages(null)
         mediaPlayer.pause()
-        playerState = STATE_PAUSED
+        playerState = PlaybackState.Paused
         if (isDarkMode()) {
             playImageView.setImageResource(R.drawable.play_night)
         } else {
@@ -134,20 +134,24 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    fun isDarkMode(): Boolean {
+    private fun isDarkMode(): Boolean {
         return when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
             Configuration.UI_MODE_NIGHT_YES -> true
             else -> false
         }
     }
 
-    fun playPause() {
+    private fun playPause() {
         when(playerState) {
-            STATE_PLAYING -> {
+            PlaybackState.Playing -> {
                 pausePlayer()
             }
-            STATE_PREPARED, STATE_PAUSED -> {
+            PlaybackState.Prepared, PlaybackState.Paused -> {
                 startPlayer()
+            }
+
+            PlaybackState.Default -> {
+
             }
         }
     }
@@ -171,10 +175,11 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
         private const val REFRESH_TIME_DELAY = 300L
     }
+
+}
+
+enum class PlaybackState {
+    Default, Prepared,Playing, Paused
 }
