@@ -1,4 +1,4 @@
-package com.example.playlistmaker.Search
+package com.example.playlistmaker.presentation
 
 import android.content.Context
 import android.icu.text.SimpleDateFormat
@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.models.Track
 import java.util.Locale
 
 class TrackViewHolder(item: View): RecyclerView.ViewHolder(item) {
@@ -27,7 +28,7 @@ class TrackViewHolder(item: View): RecyclerView.ViewHolder(item) {
 
     fun bind(model: Track) {
         title.text = model.trackName
-        val trackTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMillis)
+        val trackTime = model.trackTime
         subTitle.text = model.artistName + " \u2022 " + trackTime
         Glide
             .with(applicationContext)

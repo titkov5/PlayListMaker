@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui
 
 import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
@@ -12,7 +12,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.Search.Track
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.models.Track
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
 import java.util.Locale
@@ -108,14 +109,14 @@ class PlayerActivity : AppCompatActivity() {
             resetCurrentTime()
             mediaPlayer.seekTo(0)
             playerState = PlaybackState.Prepared
-            playImageView.setImageResource(R.drawable.play )
+            playImageView.setImageResource(R.drawable.play)
         }
     }
 
     private fun startPlayer() {
         updateTrackTime()
         mediaPlayer.start()
-        playerState =  PlaybackState.Playing
+        playerState = PlaybackState.Playing
         if (isDarkMode()) {
             playImageView.setImageResource(R.drawable.pause_night)
         } else {

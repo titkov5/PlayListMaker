@@ -1,7 +1,6 @@
-package com.example.playlistmaker.Search
+package com.example.playlistmaker.ui.Search
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,15 +16,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.MainActivity
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.ui.MainActivity
 import com.example.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
-import com.example.playlistmaker.PlayerActivity
+import com.example.playlistmaker.ui.PlayerActivity
 import com.example.playlistmaker.R
-import com.example.playlistmaker.network.NetworkService
+import com.example.playlistmaker.domain.api.TracksInteract
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.presentation.TrackAdapter
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : AppCompatActivity(), TracksInteract.TrackConsumer {
     private var currentText = ""
     private lateinit var tracksView: RecyclerView
     private lateinit var noConnectionView: LinearLayout
@@ -41,6 +43,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyTracksView: RecyclerView
     private lateinit var historyTracksAdapter: TrackAdapter
     private var isClickAllowed = true
+    private var trackRepository = Creator.provideTracksInteractor()
 
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { searchRequest() }
@@ -183,21 +186,8 @@ class SearchActivity : AppCompatActivity() {
         val searchText = searchTextEdit.text.toString()
         if (searchText.length > 2) {
             progressBar.isVisible = true
-            NetworkService.findTracks(
-                searchText,
-                { findedTracks: List<Track> ->
-                    if (findedTracks.isNullOrEmpty()) {
-                        setUpViewWith(SearchStatus.Empty)
-                    } else {
-                        setUpViewWith(SearchStatus.Success)
-                    }
-                    tracksAdapter.tracks = findedTracks
-                    tracksView.adapter?.notifyDataSetChanged()
-                },
-                failureCompletion = { error: String ->
-                    setUpViewWith(SearchStatus.Failed)
-                }
-            )
+            trackRepository.searchTracks(searchText,this)
+
         }
     }
 
@@ -212,6 +202,19 @@ class SearchActivity : AppCompatActivity() {
         const val SEARCH_REQUEST = "SEARCH_TEXT"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
+    }
+
+    override fun consumeTracks(foundedTracks: List<Track>) {
+        runOnUiThread {
+            if (foundedTracks.isNullOrEmpty()) {
+                setUpViewWith(SearchStatus.Empty)
+            } else {
+                setUpViewWith(SearchStatus.Success)
+            }
+            tracksAdapter.tracks = foundedTracks
+            tracksView.adapter?.notifyDataSetChanged()
+            //setUpViewWith(SearchStatus.Failed) жду обработки ошибок
+        }
     }
 }
 
