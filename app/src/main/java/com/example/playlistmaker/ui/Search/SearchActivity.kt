@@ -21,13 +21,13 @@ import com.example.playlistmaker.ui.MainActivity
 import com.example.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
 import com.example.playlistmaker.ui.PlayerActivity
 import com.example.playlistmaker.R
-import com.example.playlistmaker.domain.api.TracksInteract
+import com.example.playlistmaker.domain.api.TracksInteractor
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.TrackAdapter
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
 
-class SearchActivity : AppCompatActivity(), TracksInteract.TrackConsumer {
+class SearchActivity : AppCompatActivity(), TracksInteractor.TrackConsumer {
     private var currentText = ""
     private lateinit var tracksView: RecyclerView
     private lateinit var noConnectionView: LinearLayout
