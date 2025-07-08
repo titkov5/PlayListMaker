@@ -27,9 +27,19 @@ class RetrofitNetworkClient: NetworkClient {
 
     override fun doRequest(dto: Any): com.example.playlistmaker.data.dto.Response {
         if (dto is TrackSearchRequest) {
-            val response = trackAPIService.search(dto.searchText).execute()
-            val body = response.body() ?: com.example.playlistmaker.data.dto.Response()
-            return body.apply { resultCode = response.code() }
+            val response: com.example.playlistmaker.data.dto.Response
+            try {
+                val response = trackAPIService.search(dto.searchText).execute()
+                println("сюда я не пришел")
+                val body = response.body() ?: com.example.playlistmaker.data.dto.Response()
+                return body.apply { resultCode = response.code() }
+            } catch (e: Exception) {
+                println(e)
+                //
+                return com.example.playlistmaker.data.dto.Response().apply { resultCode = 400 }
+            }
+
+
         } else {
             return com.example.playlistmaker.data.dto.Response().apply { resultCode = 400 }
         }
