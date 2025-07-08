@@ -70,7 +70,7 @@ class PlayerActivity : AppCompatActivity() {
             trackCountryTextView.text = track.country
 
             val cover = findViewById<ImageView>(R.id.cover)
-            val coverUrl = track.artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
+            val coverUrl = track.artworkUrl100.replaceAfterLast('/',getString(R.string.cover512))
             Glide
                 .with(applicationContext)
                 .load(coverUrl)
