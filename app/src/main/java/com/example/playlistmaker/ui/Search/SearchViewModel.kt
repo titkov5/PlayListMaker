@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Message
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
 import androidx.core.content.ContextCompat.getSystemService
@@ -20,6 +21,7 @@ import com.example.playlistmaker.domain.api.TracksInteractor
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.TrackAdapter
 import com.example.playlistmaker.ui.PlayerActivity
+import com.example.playlistmaker.util.Resource
 
 import com.google.gson.Gson
 
@@ -27,7 +29,7 @@ class SearchViewModel(): ViewModel(), TracksInteractor.TrackConsumer  {
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { searchRequest() }
-    private var trackRepository = Creator.provideTracksInteractor()
+    private lateinit var trackRepository: TracksInteractor
     lateinit var searchHistory: SearchHistory
     lateinit var historyTracksAdapter: TrackAdapter
     lateinit var tracksAdapter: TrackAdapter
@@ -39,6 +41,7 @@ class SearchViewModel(): ViewModel(), TracksInteractor.TrackConsumer  {
     fun observeSearchStatus(): LiveData<SearchStatus> = searchStatusLiveData
 
     fun onCreate(sharedPrefs: SharedPreferences, context: Context) {
+        trackRepository = Creator.provideTracksInteractor(context)
         searchHistory = SearchHistory(sharedPrefs)
 
         tracksAdapter = TrackAdapter(
@@ -108,30 +111,32 @@ class SearchViewModel(): ViewModel(), TracksInteractor.TrackConsumer  {
         }
     }
 
-    fun searchRequest() {
+    private fun searchRequest() {
         if (searchTextLiveData.value?.length ?: 0 > 2) {
             searchStatusLiveData.postValue(SearchStatus.LoadingRequest)
             searchTextLiveData.value?.let { trackRepository.searchTracks(it,this) }
         }
     }
 
-    override fun consumeTracks(foundedTracks: List<Track>) {
-            if (foundedTracks.isNullOrEmpty()) {
-                searchStatusLiveData.postValue(SearchStatus.Empty)
-            } else {
-                searchStatusLiveData.postValue(SearchStatus.Success)
-            }
+    override fun consumeTracks(foundedTracks: List<Track>?, errorMessage: String?) {
+        if (foundedTracks.isNullOrEmpty()) {
+            searchStatusLiveData.postValue(SearchStatus.Empty)
+        } else {
+            searchStatusLiveData.postValue(SearchStatus.Success)
             tracksAdapter.tracks = foundedTracks
+        }
 
-        searchStatusLiveData.postValue(SearchStatus.Failed)
+        if (errorMessage != null) {
+            searchStatusLiveData.postValue(SearchStatus.Failed)
+        }
     }
-
 
     companion object {
         const val SEARCH_REQUEST = "SEARCH_TEXT"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
+
 }
 
 enum class SearchStatus {
