@@ -1,31 +1,23 @@
 package com.example.playlistmaker.ui.Search
 
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.Message
-import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.playlistmaker.Creator
-import com.example.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
 import com.example.playlistmaker.domain.api.TracksInteractor
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.TrackAdapter
-import com.example.playlistmaker.ui.PlayerActivity
-import com.example.playlistmaker.util.Resource
+import com.example.playlistmaker.ui.Player.PlayerActivity
 
 import com.google.gson.Gson
 
-class SearchViewModel(): ViewModel(), TracksInteractor.TrackConsumer  {
+class SearchViewModel(): ViewModel(), TracksInteractor.TrackConsumer {
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { searchRequest() }
@@ -34,7 +26,7 @@ class SearchViewModel(): ViewModel(), TracksInteractor.TrackConsumer  {
     lateinit var historyTracksAdapter: TrackAdapter
     lateinit var tracksAdapter: TrackAdapter
 
-    private val searchTextLiveData = MutableLiveData<String>("")
+    private val searchTextLiveData = MutableLiveData("")
     fun observeSearchText(): LiveData<String> = searchTextLiveData
 
     private val searchStatusLiveData = MutableLiveData<SearchStatus>(SearchStatus.None)
@@ -136,7 +128,6 @@ class SearchViewModel(): ViewModel(), TracksInteractor.TrackConsumer  {
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
-
 }
 
 enum class SearchStatus {

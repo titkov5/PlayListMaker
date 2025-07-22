@@ -2,32 +2,18 @@ package com.example.playlistmaker.ui.Search
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.Creator
 import com.example.playlistmaker.ui.MainActivity
 import com.example.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
-import com.example.playlistmaker.ui.PlayerActivity
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
-import com.example.playlistmaker.domain.api.TracksInteractor
-import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.presentation.TrackAdapter
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.gson.Gson
 
 class SearchActivity : AppCompatActivity()  {
 

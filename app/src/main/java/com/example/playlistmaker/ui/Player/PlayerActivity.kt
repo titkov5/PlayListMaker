@@ -1,12 +1,10 @@
-package com.example.playlistmaker.ui
+package com.example.playlistmaker.ui.Player
 
 import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
-import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.TypedValue
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -18,10 +16,8 @@ import com.google.gson.Gson
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
-    private var mediaPlayer = MediaPlayer()
-    private var playerState = PlaybackState.Default
-    private val handler = Handler(Looper.getMainLooper())
     private lateinit var binding: ActivityPlayerBinding
+    private val viewModel: PlayerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +33,6 @@ class PlayerActivity : AppCompatActivity() {
         if (extras != null) {
             val trackAsJson = extras.getString("Track")
             val track = Gson().fromJson(trackAsJson, Track::class.java)
-
             binding.apply {
                 trackMainTitle.text = track.trackName
                 trackSubtitle.text = track.artistName
@@ -46,7 +41,7 @@ class PlayerActivity : AppCompatActivity() {
                 trackCountryTitleValue.text = track.country
                 trackGanreValue.text = track.primaryGenreName
                 iconPlay.setOnClickListener {
-                    playPause()
+                   viewModel.playPause()
                 }
                 val coverUrl = track.artworkUrl100.replaceAfterLast('/',getString(R.string.cover512))
                 Glide
@@ -57,65 +52,34 @@ class PlayerActivity : AppCompatActivity() {
                     .into(cover)
             }
 
-            resetCurrentTime()
-            prepareMediaPlayer(track.previewUrl)
-        }
-    }
-
-    private fun resetCurrentTime() {
-        binding.trackTimeValue.text = "00:00"
-    }
-
-    private fun updateTrackTime() {
-        handler.postDelayed( {
-            val currentPosition = mediaPlayer.currentPosition
-            binding.trackTimeValue.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(currentPosition)
-            updateTrackTime()
-        },
-            REFRESH_TIME_DELAY
-        )
-    }
-
-    private fun prepareMediaPlayer(url: String) {
-        mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
-
-        mediaPlayer.setOnPreparedListener {
-            playerState = PlaybackState.Prepared
+            viewModel.prepareMediaPlayer(track.previewUrl)
         }
 
-        mediaPlayer.setOnCompletionListener {
-            handler.removeCallbacksAndMessages(null)
-            resetCurrentTime()
-            mediaPlayer.seekTo(0)
-            playerState = PlaybackState.Prepared
-            binding.iconPlay.setImageResource(R.drawable.play)
-        }
-    }
-
-    private fun startPlayer() {
-        updateTrackTime()
-        mediaPlayer.start()
-        playerState = PlaybackState.Playing
-        binding.apply {
-            if (isDarkMode()) {
-                iconPlay.setImageResource(R.drawable.pause_night)
-            } else {
-                iconPlay.setImageResource(R.drawable.pause)
+        viewModel.observePlaybackState().observe(this) {
+            when (it) {
+                PlaybackState.Playing -> {
+                    binding.apply {
+                        if (isDarkMode()) {
+                            iconPlay.setImageResource(R.drawable.pause_night)
+                        } else {
+                            iconPlay.setImageResource(R.drawable.pause)
+                        }
+                    }
+                }
+                else -> {
+                    binding.apply {
+                        if (isDarkMode()) {
+                            iconPlay.setImageResource(R.drawable.play_night)
+                        } else {
+                            iconPlay.setImageResource(R.drawable.play)
+                        }
+                    }
+                }
             }
         }
-    }
 
-    private fun pausePlayer() {
-        handler.removeCallbacksAndMessages(null)
-        mediaPlayer.pause()
-        playerState = PlaybackState.Paused
-        binding.apply {
-            if (isDarkMode()) {
-                iconPlay.setImageResource(R.drawable.play_night)
-            } else {
-                iconPlay.setImageResource(R.drawable.play)
-            }
+        viewModel.observerPlayerPosition().observe(this) {
+            binding.trackTimeValue.text = it
         }
     }
 
@@ -126,30 +90,14 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun playPause() {
-        when(playerState) {
-            PlaybackState.Playing -> {
-                pausePlayer()
-            }
-            PlaybackState.Prepared, PlaybackState.Paused -> {
-                startPlayer()
-            }
-
-            PlaybackState.Default -> {
-
-            }
-        }
-    }
-
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        viewModel.pausePlayer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
-        handler.removeCallbacksAndMessages(null)
+        viewModel.onDestroy()
     }
 
     fun dpToPx(dp: Float): Int {
@@ -158,13 +106,5 @@ class PlayerActivity : AppCompatActivity() {
             dp,
             applicationContext.resources.displayMetrics).toInt()
     }
-
-    companion object {
-        private const val REFRESH_TIME_DELAY = 300L
-    }
-
 }
 
-enum class PlaybackState {
-    Default, Prepared,Playing, Paused
-}
