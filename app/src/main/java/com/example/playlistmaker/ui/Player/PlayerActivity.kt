@@ -37,7 +37,12 @@ class PlayerActivity : AppCompatActivity() {
                 trackMainTitle.text = track.trackName
                 trackSubtitle.text = track.artistName
                 trackAlbumValue.text = track.collectionName
-                trackYearValue.text = SimpleDateFormat("yyyy", Locale.getDefault()).parse(track.releaseDate).toString()
+                trackTimeValue.text = track.trackTime
+
+                val formatter = SimpleDateFormat("yyyy", Locale.getDefault())
+                val date = formatter.parse(track.releaseDate)
+                val year = formatter.format(date)
+                trackYearValue.text = year
                 trackCountryTitleValue.text = track.country
                 trackGanreValue.text = track.primaryGenreName
                 iconPlay.setOnClickListener {
@@ -79,7 +84,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         viewModel.observerPlayerPosition().observe(this) {
-            binding.trackTimeValue.text = it
+            binding.trackTimeCurrentValue.text = it
         }
     }
 

@@ -9,8 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.playlistmaker.ui.MainActivity
-import com.example.playlistmaker.PRACTICUM_EXAMPLE_PREFERENCES
+import com.example.playlistmaker.ui.Main.MainActivity
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.google.android.material.appbar.MaterialToolbar
@@ -41,7 +40,8 @@ class SearchActivity : AppCompatActivity()  {
     private fun setupHistoryOfSearch() {
         binding.apply {
             retryButton.setOnClickListener {
-                historyOfSearch.isVisible = viewModel.searchHistory.shouldDisplay()
+                binding.historyTracksRecycleView.adapter?.notifyDataSetChanged()
+                historyOfSearch.isVisible = viewModel.shouldDisplayHistory()
             }
         }
     }
@@ -76,14 +76,14 @@ class SearchActivity : AppCompatActivity()  {
         binding.apply {
             searchEditText.addTextChangedListener(searchTextWatcher)
             searchEditText.setOnFocusChangeListener { view, b ->
-                historyTracksRecycleView.isVisible = viewModel.searchHistory.shouldDisplay()
+                viewModel.onFocusChanged()
+                historyOfSearch.isVisible = viewModel.shouldDisplayHistory()
             }
         }
     }
 
     private fun setupViewModel() {
-        val sharedPrefs = getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
-        viewModel.onCreate(sharedPrefs, this)
+        viewModel.onCreate( this)
 
         viewModel.observeSearchText().observe(this) {
             binding.searchEditText.setText(it)
@@ -102,7 +102,6 @@ class SearchActivity : AppCompatActivity()  {
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
                 tracksRecycleView.adapter?.notifyDataSetChanged()
-                historyOfSearch.isVisible = viewModel.searchHistory.shouldDisplay()
             }
         }
     }
@@ -134,7 +133,7 @@ class SearchActivity : AppCompatActivity()  {
                 tracksNothingFounded.isVisible = status == SearchStatus.Empty
 
                 if (status == SearchStatus.None) {
-                    clearHistoryButton.isVisible = viewModel.searchHistory.shouldDisplay()
+                    clearHistoryButton.isVisible = viewModel.shouldDisplayHistory()
                 }
 
                 if (status == SearchStatus.Success ||
