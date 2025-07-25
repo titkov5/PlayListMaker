@@ -29,12 +29,8 @@ class SearchViewModel(
     lateinit var tracksAdapter: TrackAdapter
     private var tracks = mutableListOf<Track>()
     lateinit var historyInteractor: SearchHistoryInteractor
-
-    private val searchTextLiveData = MutableLiveData("")
-    fun observeSearchText(): LiveData<String> = searchTextLiveData
-
-    private val searchStatusLiveData = MutableLiveData<SearchStatus>(SearchStatus.None)
-    fun observeSearchStatus(): LiveData<SearchStatus> = searchStatusLiveData
+    private val searchScreenStateLiveData = MutableLiveData(SearchScreenState("",SearchStatus.None))
+    fun observeSearchScreenState(): LiveData<SearchScreenState> = searchScreenStateLiveData
 
     fun onCreate(context: Context) {
         historyInteractor = Creator.provideSearchHistoryInteractor(context)
@@ -66,10 +62,11 @@ class SearchViewModel(
         historyInteractor.getHistory(this)
     }
 
+
     fun onClear() {
-        searchTextLiveData.postValue("")
+        val defaultState = SearchScreenState("",SearchStatus.None)
+        searchScreenStateLiveData.postValue(defaultState)
         tracksAdapter.tracks = emptyList()
-        searchStatusLiveData.postValue(SearchStatus.None)
     }
 
     private fun clickDebounce() : Boolean {
@@ -88,16 +85,32 @@ class SearchViewModel(
     fun clearHistory() {
         remove()
         historyTracksAdapter.tracks = emptyList()
-        searchStatusLiveData.postValue(SearchStatus.None)
+        updateSate(null,SearchStatus.None )
+    }
+
+    private fun updateSate(text: String?, status: SearchStatus?) {
+        val currentState = searchScreenStateLiveData.value
+        val newState = if (currentState != null) {
+            SearchScreenState(
+                text ?: currentState.text,
+                status ?: currentState.status
+            )
+        } else {
+            SearchScreenState(
+                text ?: "",
+                status ?: SearchStatus.None
+            )
+        }
+        searchScreenStateLiveData.postValue(newState)
     }
 
     fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(SEARCH_REQUEST, searchTextLiveData.value)
+        outState.putString(SEARCH_REQUEST, searchScreenStateLiveData.value?.text ?: "")
     }
 
     fun onRestoreInstanceState(savedInstanceState: Bundle) {
         val savedText = savedInstanceState.getString(SEARCH_REQUEST).toString()
-        searchTextLiveData.postValue(savedText)
+        updateSate(savedText, null)
     }
 
    private fun searchDebounce() {
@@ -106,29 +119,30 @@ class SearchViewModel(
     }
 
     fun setSearchText(searchText: String) {
-        if (searchText != searchTextLiveData.value) {
-            searchTextLiveData.postValue(searchText)
+        if (searchText != (searchScreenStateLiveData.value?.text ?: "")) {
+            updateSate(searchText, null)
             searchDebounce()
         }
     }
 
     private fun searchRequest() {
-        if (searchTextLiveData.value?.length ?: 0 > 2) {
-            searchStatusLiveData.postValue(SearchStatus.LoadingRequest)
-            searchTextLiveData.value?.let { trackRepository.searchTracks(it,this) }
+        val searchText = searchScreenStateLiveData.value?.text ?: ""
+        if (searchText.length > 2) {
+            updateSate(null,SearchStatus.LoadingRequest)
+            trackRepository.searchTracks(searchText,this)
         }
     }
 
     override fun consumeTracks(foundedTracks: List<Track>?, errorMessage: String?) {
         if (foundedTracks.isNullOrEmpty()) {
-            searchStatusLiveData.postValue(SearchStatus.Empty)
+            updateSate(null,SearchStatus.Empty)
         } else {
-            searchStatusLiveData.postValue(SearchStatus.Success)
+            updateSate(null,SearchStatus.Success)
             tracksAdapter.tracks = foundedTracks
         }
 
         if (errorMessage != null) {
-            searchStatusLiveData.postValue(SearchStatus.Failed)
+            updateSate(null,SearchStatus.Failed)
         }
     }
 

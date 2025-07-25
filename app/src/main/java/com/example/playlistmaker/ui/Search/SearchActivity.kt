@@ -85,12 +85,9 @@ class SearchActivity : AppCompatActivity()  {
     private fun setupViewModel() {
         viewModel.onCreate( this)
 
-        viewModel.observeSearchText().observe(this) {
-            binding.searchEditText.setText(it)
-        }
-
-        viewModel.observeSearchStatus().observe(this) {
-            setUpViewWith(it)
+        viewModel.observeSearchScreenState().observe(this) {
+            binding.searchEditText.setText(it.text)
+            render(it.status)
         }
     }
 
@@ -124,7 +121,7 @@ class SearchActivity : AppCompatActivity()  {
         viewModel.onRestoreInstanceState(savedInstanceState)
     }
 
-    private fun setUpViewWith(status: SearchStatus) {
+    private fun render(status: SearchStatus) {
         runOnUiThread {
             binding.apply {
                 progressBar.isVisible = status == SearchStatus.LoadingRequest
