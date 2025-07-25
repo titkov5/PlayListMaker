@@ -1,7 +1,6 @@
 package com.example.playlistmaker.ui.Search
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,10 +11,6 @@ import com.example.playlistmaker.Creator
 import com.example.playlistmaker.domain.api.SearchHistoryInteractor
 import com.example.playlistmaker.domain.api.TracksInteractor
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.presentation.TrackAdapter
-import com.example.playlistmaker.ui.Player.PlayerActivity
-
-import com.google.gson.Gson
 
 const val SEARCH_HISTORY_KEY = "key_for_search_tracks"
 
@@ -25,51 +20,24 @@ class SearchViewModel(
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { searchRequest() }
     private lateinit var trackRepository: TracksInteractor
-    lateinit var historyTracksAdapter: TrackAdapter
-    lateinit var tracksAdapter: TrackAdapter
-    private var tracks = mutableListOf<Track>()
-    lateinit var historyInteractor: SearchHistoryInteractor
-    private val searchScreenStateLiveData = MutableLiveData(SearchScreenState("",SearchStatus.None))
-    fun observeSearchScreenState(): LiveData<SearchScreenState> = searchScreenStateLiveData
+    private lateinit var historyInteractor: SearchHistoryInteractor
+    private val stateLiveData = MutableLiveData(
+        SearchScreenState(
+            "",SearchStatus.None, emptyList(), emptyList()
+    ))
+    fun observeState(): LiveData<SearchScreenState> = stateLiveData
 
     fun onCreate(context: Context) {
         historyInteractor = Creator.provideSearchHistoryInteractor(context)
         trackRepository = Creator.provideTracksInteractor(context)
-
-        tracksAdapter = TrackAdapter(
-            tracks = emptyList(),
-            { track: Track ->
-                if (clickDebounce()) {
-                    addTrack(track)
-                    val displayTrackIntent = Intent(context, PlayerActivity::class.java)
-                    val trackAsString = Gson().toJson(track)
-                    displayTrackIntent.putExtra("Track", trackAsString)
-                    context.startActivity(displayTrackIntent)
-                    historyTracksAdapter.notifyDataSetChanged()
-                }
-            }
-        )
-        historyTracksAdapter = TrackAdapter(
-            tracks,
-            { track: Track ->
-                val displayTrackIntent = Intent(context, PlayerActivity::class.java)
-                val trackAsString = Gson().toJson(track)
-                displayTrackIntent.putExtra("Track", trackAsString)
-                context.startActivity(displayTrackIntent)
-            }
-        )
-
         historyInteractor.getHistory(this)
     }
 
-
     fun onClear() {
-        val defaultState = SearchScreenState("",SearchStatus.None)
-        searchScreenStateLiveData.postValue(defaultState)
-        tracksAdapter.tracks = emptyList()
+        updateSate("",SearchStatus.None, emptyList(), null)
     }
 
-    private fun clickDebounce() : Boolean {
+    fun clickDebounce() : Boolean {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
@@ -77,40 +45,43 @@ class SearchViewModel(
         }
         return current
     }
-    fun onFocusChanged() {
-        historyTracksAdapter.tracks = tracks
-        historyTracksAdapter.notifyDataSetChanged()
-    }
 
     fun clearHistory() {
-        remove()
-        historyTracksAdapter.tracks = emptyList()
-        updateSate(null,SearchStatus.None )
+        updateSate(null, null, null, emptyList())
+        historyInteractor.removeHistory()
     }
 
-    private fun updateSate(text: String?, status: SearchStatus?) {
-        val currentState = searchScreenStateLiveData.value
+    private fun updateSate(
+        text: String?,
+        status: SearchStatus?,
+        tracks: List<Track>?,
+        historyTracks: List<Track>?) {
+        val currentState = stateLiveData.value
         val newState = if (currentState != null) {
             SearchScreenState(
                 text ?: currentState.text,
-                status ?: currentState.status
+                status ?: currentState.status,
+                tracks ?: currentState.tracks,
+                historyTracks ?: currentState.historyTracks
             )
         } else {
             SearchScreenState(
                 text ?: "",
-                status ?: SearchStatus.None
+                status ?: SearchStatus.None,
+                tracks ?: emptyList(),
+                historyTracks ?: emptyList()
             )
         }
-        searchScreenStateLiveData.postValue(newState)
+        stateLiveData.postValue(newState)
     }
 
     fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(SEARCH_REQUEST, searchScreenStateLiveData.value?.text ?: "")
+        outState.putString(SEARCH_REQUEST, stateLiveData.value?.text ?: "")
     }
 
     fun onRestoreInstanceState(savedInstanceState: Bundle) {
         val savedText = savedInstanceState.getString(SEARCH_REQUEST).toString()
-        updateSate(savedText, null)
+        updateSate(savedText, null, null,null)
     }
 
    private fun searchDebounce() {
@@ -119,30 +90,29 @@ class SearchViewModel(
     }
 
     fun setSearchText(searchText: String) {
-        if (searchText != (searchScreenStateLiveData.value?.text ?: "")) {
-            updateSate(searchText, null)
+        if (searchText != (stateLiveData.value?.text ?: "")) {
+            updateSate(searchText, null, null, null)
             searchDebounce()
         }
     }
 
     private fun searchRequest() {
-        val searchText = searchScreenStateLiveData.value?.text ?: ""
+        val searchText = stateLiveData.value?.text ?: ""
         if (searchText.length > 2) {
-            updateSate(null,SearchStatus.LoadingRequest)
+            updateSate(null,SearchStatus.LoadingRequest, null, null)
             trackRepository.searchTracks(searchText,this)
         }
     }
 
     override fun consumeTracks(foundedTracks: List<Track>?, errorMessage: String?) {
         if (foundedTracks.isNullOrEmpty()) {
-            updateSate(null,SearchStatus.Empty)
+            updateSate(null,SearchStatus.Empty, null, null)
         } else {
-            updateSate(null,SearchStatus.Success)
-            tracksAdapter.tracks = foundedTracks
+            updateSate(null,SearchStatus.Success, foundedTracks, null)
         }
 
         if (errorMessage != null) {
-            updateSate(null,SearchStatus.Failed)
+            updateSate(null,SearchStatus.Failed, null, null)
         }
     }
 
@@ -153,11 +123,12 @@ class SearchViewModel(
     }
 
     fun shouldDisplayHistory(): Boolean {
-        val diff = tracks.isNotEmpty()
-        return diff
+        return stateLiveData.value?.historyTracks?.isNotEmpty() ?: false
     }
 
     fun addTrack(selectedTrack: Track) {
+        val tracks = (stateLiveData.value?.historyTracks ?: emptyList()).toMutableList()
+
         if (tracks.isEmpty()) {
             tracks.add(selectedTrack)
         }
@@ -169,24 +140,16 @@ class SearchViewModel(
         tracks.removeIf { it.trackId == selectedTrack.trackId}
         tracks.add(0, selectedTrack)
 
-        save()
-    }
+        val newTracks = tracks.toList()
+        updateSate(null, null, null, newTracks)
 
-    private fun save() {
         historyInteractor.removeHistory()
-        tracks.map { historyInteractor.saveToHistory(it) }
-    }
-
-    fun remove() {
-        tracks = mutableListOf()
-        historyInteractor.removeHistory()
+        newTracks.map { historyInteractor.saveToHistory(it) }
     }
 
     override fun consume(searchHistory: List<Track>?) {
         if (searchHistory != null) {
-            tracks = searchHistory.toMutableList()
-            historyTracksAdapter.tracks = tracks
-            historyTracksAdapter.notifyDataSetChanged()
+            updateSate(null,null,null, searchHistory)
         }
     }
 }

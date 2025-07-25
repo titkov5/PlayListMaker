@@ -12,47 +12,74 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.ui.Main.MainActivity
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.presentation.TrackAdapter
+import com.example.playlistmaker.ui.Player.PlayerActivity
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.gson.Gson
 
 class SearchActivity : AppCompatActivity()  {
-
     private val viewModel: SearchViewModel by viewModels()
     private lateinit var binding: ActivitySearchBinding
+    lateinit var historyTracksAdapter: TrackAdapter
+    lateinit var tracksAdapter: TrackAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setupViewModel()
+
         setupClearIcon()
         setupToolBar()
         setupHistoryOfSearch()
         searchEdit()
         setupTracksView()
         setupHistoryTracksView()
+        setupViewModel()
     }
 
     private fun setupTracksView() {
         binding.tracksRecycleView.layoutManager = LinearLayoutManager(this)
-        binding.tracksRecycleView.adapter = viewModel.tracksAdapter
+        tracksAdapter = TrackAdapter(
+            tracks = emptyList(),
+            { track: Track ->
+                if (viewModel.clickDebounce()) {
+                    viewModel.addTrack(track)
+                    val displayTrackIntent = Intent(this, PlayerActivity::class.java)
+                    val trackAsString = Gson().toJson(track)
+                    displayTrackIntent.putExtra("Track", trackAsString)
+                    startActivity(displayTrackIntent)
+                    historyTracksAdapter.notifyDataSetChanged()
+                }
+            }
+        )
+        binding.tracksRecycleView.adapter = tracksAdapter
     }
 
     private fun setupHistoryOfSearch() {
-        binding.apply {
-            retryButton.setOnClickListener {
+            binding.retryButton.setOnClickListener {
                 binding.historyTracksRecycleView.adapter?.notifyDataSetChanged()
-                historyOfSearch.isVisible = viewModel.shouldDisplayHistory()
+                binding.historyOfSearch.isVisible = viewModel.shouldDisplayHistory()
             }
-        }
     }
 
     private fun setupHistoryTracksView() {
+        historyTracksAdapter = TrackAdapter(
+            emptyList(),//tracks
+            { track: Track ->
+                val displayTrackIntent = Intent(this, PlayerActivity::class.java)
+                val trackAsString = Gson().toJson(track)
+                displayTrackIntent.putExtra("Track", trackAsString)
+                startActivity(displayTrackIntent)
+            }
+        )
+
         binding.apply {
             clearHistoryButton.setOnClickListener {
                 viewModel.clearHistory()
                 binding.historyTracksRecycleView.adapter?.notifyDataSetChanged()
             }
-            historyTracksRecycleView.adapter = viewModel.historyTracksAdapter
+            historyTracksRecycleView.adapter = historyTracksAdapter
         }
         binding.historyTracksRecycleView.layoutManager = LinearLayoutManager(this)
     }
@@ -76,8 +103,8 @@ class SearchActivity : AppCompatActivity()  {
         binding.apply {
             searchEditText.addTextChangedListener(searchTextWatcher)
             searchEditText.setOnFocusChangeListener { view, b ->
-                viewModel.onFocusChanged()
                 historyOfSearch.isVisible = viewModel.shouldDisplayHistory()
+                historyTracksAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -85,9 +112,13 @@ class SearchActivity : AppCompatActivity()  {
     private fun setupViewModel() {
         viewModel.onCreate( this)
 
-        viewModel.observeSearchScreenState().observe(this) {
+        viewModel.observeState().observe(this) {
             binding.searchEditText.setText(it.text)
             render(it.status)
+            tracksAdapter.tracks = it.tracks
+            tracksAdapter.notifyDataSetChanged()
+            historyTracksAdapter.tracks = it.historyTracks
+            historyTracksAdapter.notifyDataSetChanged()
         }
     }
 
