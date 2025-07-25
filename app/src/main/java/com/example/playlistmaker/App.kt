@@ -12,8 +12,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        val sharedPrefs = getSharedPreferences(PRACTICUM_EXAMPLE_PREFERENCES, MODE_PRIVATE)
-        darkTheme = sharedPrefs.getBoolean(DARK_THEME_KEY, false)
+        darkTheme = Creator.provideSettingsInteractor(this).getDarkThemeValue()
         switchTheme(darkTheme)
     }
 

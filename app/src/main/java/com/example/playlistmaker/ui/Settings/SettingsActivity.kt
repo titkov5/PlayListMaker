@@ -18,24 +18,43 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         binding.toolbar.setNavigationOnClickListener {
             finish()
         }
 
         binding.userAgreement.setOnClickListener {
-            viewModel.userAgreementOnClick(this)
+            val uri = Uri.parse(getString(R.string.offerString))
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            startActivity(intent)
         }
 
         binding.shareApp.setOnClickListener {
-            viewModel.shareAppOnClick(this)
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.androidRazrab))
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
         }
 
         binding.contactSupport.setOnClickListener {
-            viewModel.contactSupportOnClick(this)
+            val message = getString(R.string.thanksAll)
+            val subject = getString(R.string.messageToAll)
+            val shareIntent = Intent(Intent.ACTION_SENDTO)
+            shareIntent.data = Uri.parse("mailto:")
+            shareIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(R.string.myMail))
+            shareIntent.putExtra(Intent.EXTRA_TEXT, message)
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT,subject)
+            startActivity(shareIntent)
         }
 
-        binding.darkThemSwithcher.isChecked =  (applicationContext as App).darkTheme
+        viewModel.observeState().observe(this) {
+            binding.darkThemSwithcher.isChecked = it
+        }
+        viewModel.onCreate(this)
         binding.darkThemSwithcher.setOnCheckedChangeListener { _, checked ->
             viewModel.checkDarkTheme(checked,this, (applicationContext as App))
         }
