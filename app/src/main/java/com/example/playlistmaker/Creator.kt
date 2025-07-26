@@ -48,7 +48,8 @@ object Creator {
             PrefsStorageClient<Boolean>(
                 context,
                 DARK_THEME_KEY,
-                object : TypeToken<Boolean>() {}.type)
+                object : TypeToken<Boolean>() {}.type),
+            context.applicationContext as App
         )
     }
 

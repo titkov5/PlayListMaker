@@ -4,5 +4,5 @@ import android.content.Context
 
 interface SettingsRepository {
     fun getDarkThemeValue(): Boolean
-    fun saveDarkThemeValue(isDark: Boolean)
+    fun saveAndApplyDarkThemeValue(isDark: Boolean)
 }

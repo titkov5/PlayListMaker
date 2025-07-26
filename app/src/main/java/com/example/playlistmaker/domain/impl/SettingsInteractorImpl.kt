@@ -10,8 +10,7 @@ class SettingsInteractorImpl(
        return repository.getDarkThemeValue()
     }
 
-    override fun saveDarkThemeValue(isDark: Boolean) {
-        repository.saveDarkThemeValue(isDark)
+    override fun saveAndApplyDarkThemeValue(isDark: Boolean) {
+        repository.saveAndApplyDarkThemeValue(isDark)
     }
-
 }

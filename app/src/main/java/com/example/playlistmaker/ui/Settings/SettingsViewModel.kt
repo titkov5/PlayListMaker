@@ -14,8 +14,7 @@ class SettingsViewModel: ViewModel() {
 
     fun checkDarkTheme(checked: Boolean, context: Context, app: App) {
         stateLiveData.postValue(checked)
-        app.switchTheme(checked)
-        Creator.provideSettingsInteractor(context).saveDarkThemeValue(checked)
+        Creator.provideSettingsInteractor(context).saveAndApplyDarkThemeValue(checked)
     }
 
     fun onCreate(context: Context) {

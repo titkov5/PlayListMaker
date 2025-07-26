@@ -2,13 +2,13 @@ package com.example.playlistmaker
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.domain.api.DarkThemSwitcher
 
-const val PRACTICUM_EXAMPLE_PREFERENCES = "practicum_example_preferences"
 const val DARK_THEME_KEY = "key_for_edit_text"
 
-class App : Application() {
+class App : Application(), DarkThemSwitcher {
 
-    var darkTheme = false
+    private var darkTheme = false
 
     override fun onCreate() {
         super.onCreate()
@@ -16,7 +16,7 @@ class App : Application() {
         switchTheme(darkTheme)
     }
 
-    fun switchTheme(darkThemeEnabled: Boolean) {
+    override fun switchTheme(darkThemeEnabled: Boolean) {
         darkTheme = darkThemeEnabled
         AppCompatDelegate.setDefaultNightMode(
             if (darkThemeEnabled) {
