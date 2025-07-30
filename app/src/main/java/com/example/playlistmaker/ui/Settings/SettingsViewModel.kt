@@ -4,20 +4,21 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.App
-import com.example.playlistmaker.Creator
+import com.example.playlistmaker.domain.api.SettingsInteractor
 
 
-class SettingsViewModel: ViewModel() {
+class SettingsViewModel(
+    private val settingsInteractor: SettingsInteractor
+): ViewModel() {
     private val stateLiveData = MutableLiveData(false)
     fun observeState(): LiveData<Boolean> = stateLiveData
 
-    fun checkDarkTheme(checked: Boolean, context: Context, app: App) {
+    fun checkDarkTheme(checked: Boolean) {
         stateLiveData.postValue(checked)
-        Creator.provideSettingsInteractor(context).saveAndApplyDarkThemeValue(checked)
+        settingsInteractor.saveAndApplyDarkThemeValue(checked)
     }
 
-    fun onCreate(context: Context) {
-        stateLiveData.postValue(Creator.provideSettingsInteractor(context).getDarkThemeValue())
+    fun onCreate() {
+        stateLiveData.postValue(settingsInteractor.getDarkThemeValue())
     }
 }

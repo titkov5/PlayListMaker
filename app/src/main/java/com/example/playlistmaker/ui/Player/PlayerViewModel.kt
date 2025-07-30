@@ -12,7 +12,6 @@ import java.util.Locale
 class PlayerViewModel: ViewModel() {
     private var mediaPlayer = MediaPlayer()
     private val handler = Handler(Looper.getMainLooper())
-
     private val playbackStateLiveData = MutableLiveData(PlaybackState.Default)
     fun observePlaybackState(): LiveData<PlaybackState> = playbackStateLiveData
 

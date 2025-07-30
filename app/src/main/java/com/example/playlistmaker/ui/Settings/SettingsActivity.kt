@@ -3,15 +3,14 @@ package com.example.playlistmaker.ui.Settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.playlistmaker.App
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
-    private val viewModel: SettingsViewModel by viewModels()
+    private val viewModel by viewModel<SettingsViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,9 +51,9 @@ class SettingsActivity : AppCompatActivity() {
         viewModel.observeState().observe(this) {
             binding.darkThemSwithcher.isChecked = it
         }
-        viewModel.onCreate(this)
+        viewModel.onCreate()
         binding.darkThemSwithcher.setOnCheckedChangeListener { _, checked ->
-            viewModel.checkDarkTheme(checked,this, (applicationContext as App))
+            viewModel.checkDarkTheme(checked)
         }
     }
 }

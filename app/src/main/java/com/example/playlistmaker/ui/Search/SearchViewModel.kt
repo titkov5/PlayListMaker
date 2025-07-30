@@ -1,35 +1,30 @@
 package com.example.playlistmaker.ui.Search
 
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.Creator
 import com.example.playlistmaker.domain.api.SearchHistoryInteractor
 import com.example.playlistmaker.domain.api.TracksInteractor
 import com.example.playlistmaker.domain.models.Track
 
-const val SEARCH_HISTORY_KEY = "key_for_search_tracks"
-
 class SearchViewModel(
+    private val  trackRepository: TracksInteractor,
+    private val historyInteractor: SearchHistoryInteractor
 ): ViewModel(), TracksInteractor.TrackConsumer, SearchHistoryInteractor.HistoryConsumer {
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { searchRequest() }
-    private lateinit var trackRepository: TracksInteractor
-    private lateinit var historyInteractor: SearchHistoryInteractor
+
     private val stateLiveData = MutableLiveData(
         SearchScreenState(
             "",SearchStatus.None, emptyList(), emptyList()
     ))
     fun observeState(): LiveData<SearchScreenState> = stateLiveData
 
-    fun onCreate(context: Context) {
-        historyInteractor = Creator.provideSearchHistoryInteractor(context)
-        trackRepository = Creator.provideTracksInteractor(context)
+    fun onCreate() {
         historyInteractor.getHistory(this)
     }
 
