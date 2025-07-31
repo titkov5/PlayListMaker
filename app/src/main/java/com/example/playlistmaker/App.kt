@@ -2,9 +2,14 @@ package com.example.playlistmaker
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.di.dataModule
+import com.example.playlistmaker.di.interactorModule
+import com.example.playlistmaker.di.repositoryModule
+import com.example.playlistmaker.di.viewModelModule
 import com.example.playlistmaker.domain.api.DarkThemSwitcher
-
-const val DARK_THEME_KEY = "key_for_edit_text"
+import com.example.playlistmaker.domain.impl.DarkThemeStorageImpl
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.GlobalContext.startKoin
 
 class App : Application(), DarkThemSwitcher {
 
@@ -12,8 +17,14 @@ class App : Application(), DarkThemSwitcher {
 
     override fun onCreate() {
         super.onCreate()
-        darkTheme = Creator.provideSettingsInteractor(this).getDarkThemeValue()
+       darkTheme = DarkThemeStorageImpl(this).getData() == true
+
         switchTheme(darkTheme)
+
+        startKoin {
+            androidContext(this@App)
+            modules(dataModule, repositoryModule, interactorModule, viewModelModule)
+        }
     }
 
     override fun switchTheme(darkThemeEnabled: Boolean) {

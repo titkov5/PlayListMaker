@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,9 +16,10 @@ import com.example.playlistmaker.presentation.TrackAdapter
 import com.example.playlistmaker.ui.Player.PlayerActivity
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity()  {
-    private val viewModel: SearchViewModel by viewModels()
+    private val viewModel by viewModel<SearchViewModel>()
     private lateinit var binding: ActivitySearchBinding
     lateinit var historyTracksAdapter: TrackAdapter
     lateinit var tracksAdapter: TrackAdapter
@@ -110,7 +110,7 @@ class SearchActivity : AppCompatActivity()  {
     }
 
     private fun setupViewModel() {
-        viewModel.onCreate( this)
+        viewModel.onCreate()
 
         viewModel.observeState().observe(this) {
             binding.searchEditText.setText(it.text)

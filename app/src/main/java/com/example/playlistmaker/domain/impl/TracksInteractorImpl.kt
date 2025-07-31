@@ -2,7 +2,6 @@ package com.example.playlistmaker.domain.impl
 
 import com.example.playlistmaker.domain.api.TrackRepository
 import com.example.playlistmaker.domain.api.TracksInteractor
-import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.util.Resource
 
 class TracksInteractorImpl(private val trackRepository: TrackRepository): TracksInteractor {
