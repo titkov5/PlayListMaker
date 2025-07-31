@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -61,4 +62,5 @@ dependencies {
     implementation ("androidx.activity:activity-ktx:1.6.1")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
     implementation ("io.insert-koin:koin-android:3.3.0")
+    implementation ("androidx.fragment:fragment-ktx:1.5.5")
 }
