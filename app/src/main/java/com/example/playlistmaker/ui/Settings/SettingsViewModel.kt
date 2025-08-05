@@ -1,11 +1,9 @@
 package com.example.playlistmaker.ui.Settings
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.playlistmaker.domain.api.SettingsInteractor
-
 
 class SettingsViewModel(
     private val settingsInteractor: SettingsInteractor

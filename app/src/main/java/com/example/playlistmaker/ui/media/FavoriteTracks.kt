@@ -1,0 +1,26 @@
+package com.example.playlistmaker.ui.media
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.example.playlistmaker.databinding.FragmentFavoriteTracksBinding
+
+class FavoriteTracks: Fragment() {
+    private val tracks = "Na-na,bravo,fifty,kizomba,birmingame,aex"
+    // используем ViewBinding, мы можем использовать его так же как и в Activity
+
+    private var _binding: FragmentFavoriteTracksBinding? = null
+
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentFavoriteTracksBinding.inflate(inflater, container, false)
+
+        return binding.root
+    }
+}
