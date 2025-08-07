@@ -20,9 +20,8 @@
     <string name="androidRazrab">https://practicum.yandex.ru/android-developer/</string>
     <string name="nothing_founded">Ничего не нашлось</string>
     <string name="media_lib_empty">Ваша медиатека пуста</string>
-    <string name="play_list_empty">Вы не создали ни одного плейлиста</string>
-    <string name="new_play_list">Ваша медиатека пуста</string>
-
+    <string name="play_list_empty">Вы не создали \n ни одного плейлиста</string>
+    <string name="new_play_list">Новый плейлист</string>
 
     <string name="connection_issue">Проблемы со связью \n \n Загрузка не удалась. Проверьте \n подключение к интернету</string>
     <string name="itunes_base_url">https://itunes.apple.com/</string>

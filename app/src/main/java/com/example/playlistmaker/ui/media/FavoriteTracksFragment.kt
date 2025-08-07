@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.playlistmaker.databinding.FragmentFavoriteTracksBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FavoriteTracksFragment: Fragment() {
+    private val viewModel by viewModel<FavoriteTracksViewModel>()
     private var _binding: FragmentFavoriteTracksBinding? = null
     private val binding get() = _binding!!
 
@@ -23,6 +25,16 @@ class FavoriteTracksFragment: Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val NUMBER = "number"
+
+        fun newInstance(number: Int) = FavoriteTracksFragment().apply {
+            arguments = Bundle().apply {
+                putInt(NUMBER, number)
+            }
+        }
     }
 }
 

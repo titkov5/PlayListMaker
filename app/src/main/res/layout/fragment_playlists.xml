@@ -17,6 +17,7 @@
             android:id="@+id/add_play_list"
             style="@style/TrackSearch.Warn.Button.Retry.Theme"
             android:text="@string/new_play_list"
+            android:visibility="visible"
             />
 
         <ImageView

@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : Fragment() {
+    private val viewModel by viewModel<PlaylistsFragmentViewModel>()
     private var _binding: FragmentPlaylistsBinding? = null
     private val binding get() = _binding!!
 
@@ -23,5 +25,15 @@ class PlaylistsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val NUMBER = "number"
+
+        fun newInstance(number: Int) = PlaylistsFragment().apply {
+            arguments = Bundle().apply {
+                putInt(NUMBER, number)
+            }
+        }
     }
 }
