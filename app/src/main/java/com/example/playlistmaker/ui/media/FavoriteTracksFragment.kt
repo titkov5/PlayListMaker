@@ -7,12 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.playlistmaker.databinding.FragmentFavoriteTracksBinding
 
-class FavoriteTracks: Fragment() {
-    private val tracks = "Na-na,bravo,fifty,kizomba,birmingame,aex"
-    // используем ViewBinding, мы можем использовать его так же как и в Activity
-
+class FavoriteTracksFragment: Fragment() {
     private var _binding: FragmentFavoriteTracksBinding? = null
-
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -23,4 +19,10 @@ class FavoriteTracks: Fragment() {
 
         return binding.root
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
+

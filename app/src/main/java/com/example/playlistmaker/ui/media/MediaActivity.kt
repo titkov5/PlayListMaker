@@ -20,13 +20,20 @@ class MediaActivity : AppCompatActivity() {
         binding = ActivityMediaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.mediaToolbar.setNavigationOnClickListener {
+            finish()
+        }
+
         binding.viewPager.adapter = MediaPageViewAdapter(supportFragmentManager, lifecycle)
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             when(position) {
-                0 -> tab.text = "Избранные треки"
-                1 -> tab.text = "Плейлисты"
+                0 -> tab.text = getString(R.string.fav_tracks)
+                1 -> tab.text = getString(R.string.play_lists)
             }
         }
+
         tabMediator.attach()
     }
+
+
 }

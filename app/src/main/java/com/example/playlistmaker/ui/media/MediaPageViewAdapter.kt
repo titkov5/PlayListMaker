@@ -13,9 +13,8 @@ class MediaPageViewAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycl
 
     override fun createFragment(position: Int): Fragment {
         return when(position) {
-            0 -> FavoriteTracks()
-            1 -> Playlists()
-            else -> Playlists()
+            0 -> FavoriteTracksFragment()
+            else -> PlaylistsFragment()
         }
     }
 }

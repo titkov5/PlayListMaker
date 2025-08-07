@@ -38,4 +38,8 @@
     <string name="track_name_placeholder">Название трека</string>
     <string name="track_singer_placeholder">исполнитель</string>
     <string name="cover512">512x512bb.jpg</string>
+    <string name="fav_tracks">"Избранные треки"</string>
+    <string name="play_lists">"Плейлисты"</string>
+
+
 </resources>
