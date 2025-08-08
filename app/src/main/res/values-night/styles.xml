@@ -124,6 +124,9 @@
         <item name="android:background">@color/black</item>
         <item name="tabTextColor">@color/white</item>
         <item name="tabIndicatorColor">@color/white</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textAllCaps">false</item>
+        <item name= "tabTextAppearance">@android:style/TextAppearance.Widget.TabWidget</item>
     </style>
 
 </resources>
