@@ -26,7 +26,7 @@
             android:name=".ui.media.MediaFragment"
             android:exported="false" />
         <activity
-            android:name=".ui.Settings.SettingsActivity"
+            android:name=".ui.Settings.SettingsFragment"
             android:exported="false" />
         <activity
             android:name=".ui.Main.MainActivity"

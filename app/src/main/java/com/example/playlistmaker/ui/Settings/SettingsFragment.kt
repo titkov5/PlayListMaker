@@ -3,23 +3,32 @@ package com.example.playlistmaker.ui.Settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import com.example.playlistmaker.databinding.ActivityMediaBinding
+import com.example.playlistmaker.databinding.FragmentSettingsBinding
+import com.example.playlistmaker.ui.media.MediaPageViewAdapter
+import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
-    private lateinit var binding: ActivitySettingsBinding
+class SettingsFragment : Fragment() {
+
     private val viewModel by viewModel<SettingsViewModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
 
-        binding.toolbar.setNavigationOnClickListener {
-            finish()
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        _binding = FragmentSettingsBinding.inflate(layoutInflater)
 
         binding.userAgreement.setOnClickListener {
             val uri = Uri.parse(getString(R.string.offerString))
@@ -48,12 +57,19 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(shareIntent)
         }
 
-        viewModel.observeState().observe(this) {
+        viewModel.observeState().observe(viewLifecycleOwner) {
             binding.darkThemSwithcher.isChecked = it
         }
         viewModel.onCreate()
         binding.darkThemSwithcher.setOnCheckedChangeListener { _, checked ->
             viewModel.checkDarkTheme(checked)
         }
+
+        return binding.root
+}
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

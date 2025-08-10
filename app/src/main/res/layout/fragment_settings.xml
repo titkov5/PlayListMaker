@@ -6,12 +6,6 @@
     android:orientation="vertical"
     style="@style/SecondaryBackground"
     >
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        style="@style/ToolbarStyle"
-        app:navigationIcon="@drawable/arrow_back"
-        app:title="@string/settings"
-        />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/dark_them_swithcher"

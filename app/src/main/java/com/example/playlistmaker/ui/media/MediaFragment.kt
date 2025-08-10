@@ -42,5 +42,4 @@ class MediaFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }
