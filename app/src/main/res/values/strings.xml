@@ -19,6 +19,10 @@
     <string name="offerString">https://yandex.ru/legal/practicum_offer</string>
     <string name="androidRazrab">https://practicum.yandex.ru/android-developer/</string>
     <string name="nothing_founded">Ничего не нашлось</string>
+    <string name="media_lib_empty">Ваша медиатека пуста</string>
+    <string name="play_list_empty">Вы не создали \n ни одного плейлиста</string>
+    <string name="new_play_list">Новый плейлист</string>
+
     <string name="connection_issue">Проблемы со связью \n \n Загрузка не удалась. Проверьте \n подключение к интернету</string>
     <string name="itunes_base_url">https://itunes.apple.com/</string>
     <string name="your_search_history">Вы искали</string>
@@ -33,4 +37,8 @@
     <string name="track_name_placeholder">Название трека</string>
     <string name="track_singer_placeholder">исполнитель</string>
     <string name="cover512">512x512bb.jpg</string>
+    <string name="fav_tracks">"Избранные треки"</string>
+    <string name="play_lists">"Плейлисты"</string>
+
+
 </resources>

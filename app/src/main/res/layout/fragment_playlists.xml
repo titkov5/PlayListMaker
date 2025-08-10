@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:id = "@+id/tracks_nothing_founded"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="visible"
+        style="@style/SecondaryBackground"
+        >
+
+        <Button
+            android:id="@+id/add_play_list"
+            style="@style/TrackSearch.Warn.Button.Retry.Theme"
+            android:text="@string/new_play_list"
+            android:visibility="visible"
+            />
+
+        <ImageView
+            style="@style/TrackSearch.Warn.Image.Noting"
+            android:layout_marginTop = "@dimen/padding_36"
+            />
+
+        <TextView
+            style="@style/ActivitySearch.Warn.Title.Theme"
+            android:text="@string/play_list_empty"
+            >
+        </TextView>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
