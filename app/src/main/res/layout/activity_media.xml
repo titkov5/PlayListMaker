@@ -6,13 +6,6 @@
     style="@style/SecondaryBackground"
     android:orientation="vertical">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/media_toolbar"
-        style="@style/ToolbarStyle"
-        app:title="@string/media_library"
-        app:navigationIcon="@drawable/arrow_back"
-        />
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
