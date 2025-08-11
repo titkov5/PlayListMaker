@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityMediaBinding
+import com.example.playlistmaker.databinding.FragmentMediaBinding
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -14,7 +14,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MediaFragment : Fragment() {
     private val viewModel by viewModel<MediaViewModel>()
     private lateinit var tabMediator: TabLayoutMediator
-    private var _binding: ActivityMediaBinding? = null
+    private var _binding: FragmentMediaBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -22,7 +22,7 @@ class MediaFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = ActivityMediaBinding.inflate(inflater, container, false)
+        _binding = FragmentMediaBinding.inflate(inflater, container, false)
 
         val fragmentManager = requireActivity().supportFragmentManager
         binding.viewPager.adapter = MediaPageViewAdapter(fragmentManager, lifecycle)

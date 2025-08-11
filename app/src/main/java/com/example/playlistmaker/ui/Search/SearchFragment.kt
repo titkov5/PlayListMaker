@@ -1,55 +1,69 @@
 package com.example.playlistmaker.ui.Search
 
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.playlistmaker.ui.Main.MainActivity
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.TrackAdapter
-import com.example.playlistmaker.ui.Player.PlayerActivity
-import com.google.android.material.appbar.MaterialToolbar
+import com.example.playlistmaker.ui.Player.PlayerFragment
 import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity()  {
+class SearchFragment : Fragment()  {
     private val viewModel by viewModel<SearchViewModel>()
-    private lateinit var binding: ActivitySearchBinding
     lateinit var historyTracksAdapter: TrackAdapter
     lateinit var tracksAdapter: TrackAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentSearchBinding.inflate(layoutInflater)
         setupClearIcon()
-        setupToolBar()
         setupHistoryOfSearch()
         searchEdit()
         setupTracksView()
         setupHistoryTracksView()
         setupViewModel()
+
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupTracksView() {
-        binding.tracksRecycleView.layoutManager = LinearLayoutManager(this)
+        binding.tracksRecycleView.layoutManager = LinearLayoutManager(requireActivity())
         tracksAdapter = TrackAdapter(
             tracks = emptyList(),
             { track: Track ->
                 if (viewModel.clickDebounce()) {
                     viewModel.addTrack(track)
-                    val displayTrackIntent = Intent(this, PlayerActivity::class.java)
                     val trackAsString = Gson().toJson(track)
-                    displayTrackIntent.putExtra("Track", trackAsString)
-                    startActivity(displayTrackIntent)
                     historyTracksAdapter.notifyDataSetChanged()
+
+                    parentFragmentManager.commit {
+                        replace(R.id.rootFragmentContainerView, PlayerFragment.newInstance(trackAsString))
+                        addToBackStack(null)
+                    }
                 }
             }
         )
@@ -57,20 +71,21 @@ class SearchActivity : AppCompatActivity()  {
     }
 
     private fun setupHistoryOfSearch() {
-            binding.retryButton.setOnClickListener {
-                binding.historyTracksRecycleView.adapter?.notifyDataSetChanged()
-                binding.historyOfSearch.isVisible = viewModel.shouldDisplayHistory()
-            }
+        binding.retryButton.setOnClickListener {
+            binding.historyTracksRecycleView.adapter?.notifyDataSetChanged()
+            binding.historyOfSearch.isVisible = viewModel.shouldDisplayHistory()
+        }
     }
 
     private fun setupHistoryTracksView() {
         historyTracksAdapter = TrackAdapter(
-            emptyList(),//tracks
+            emptyList(),
             { track: Track ->
-                val displayTrackIntent = Intent(this, PlayerActivity::class.java)
                 val trackAsString = Gson().toJson(track)
-                displayTrackIntent.putExtra("Track", trackAsString)
-                startActivity(displayTrackIntent)
+                parentFragmentManager.commit {
+                    replace(R.id.rootFragmentContainerView, PlayerFragment.newInstance(trackAsString))
+                    addToBackStack(null)
+                }
             }
         )
 
@@ -81,7 +96,7 @@ class SearchActivity : AppCompatActivity()  {
             }
             historyTracksRecycleView.adapter = historyTracksAdapter
         }
-        binding.historyTracksRecycleView.layoutManager = LinearLayoutManager(this)
+        binding.historyTracksRecycleView.layoutManager = LinearLayoutManager(requireActivity())
     }
 
     private fun searchEdit() {
@@ -112,7 +127,7 @@ class SearchActivity : AppCompatActivity()  {
     private fun setupViewModel() {
         viewModel.onCreate()
 
-        viewModel.observeState().observe(this) {
+        viewModel.observeState().observe(viewLifecycleOwner) {
             binding.searchEditText.setText(it.text)
             render(it.status)
             tracksAdapter.tracks = it.tracks
@@ -127,33 +142,28 @@ class SearchActivity : AppCompatActivity()  {
             clearIcon.setOnClickListener {
                 viewModel.onClear()
                 val inputMethodManager =
-                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
                 tracksRecycleView.adapter?.notifyDataSetChanged()
             }
         }
     }
 
-    private fun setupToolBar() {
-        val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
-        toolbar.setNavigationOnClickListener {
-            val displayIntent = Intent(this, MainActivity::class.java)
-            startActivity(displayIntent)
-        }
-    }
+//    private fun setupToolBar() {
+//        val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
+//        toolbar.setNavigationOnClickListener {
+//            val displayIntent = Intent(this, MainActivity::class.java)
+//            startActivity(displayIntent)
+//        }
+//    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         viewModel.onSaveInstanceState(outState)
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        viewModel.onRestoreInstanceState(savedInstanceState)
-    }
-
     private fun render(status: SearchStatus) {
-        runOnUiThread {
+        requireActivity().runOnUiThread {
             binding.apply {
                 progressBar.isVisible = status == SearchStatus.LoadingRequest
                 tracksRecycleView.isVisible = status == SearchStatus.Success
