@@ -33,7 +33,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bottom_navigation_menu"
-        app:itemTextAppearanceActiveBoldEnabled="false"
+
+        app:itemIconTint="@drawable/bottom_navigation_item_background_colors"
+        app:itemTextColor="@drawable/bottom_navigation_item_background_colors"
+
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
