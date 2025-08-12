@@ -8,6 +8,12 @@
     style="@style/SecondaryBackground"
     tools:context=".ui.Settings.SettingsFragment">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/search_toolbar"
+        style="@style/ToolbarStyle"
+        app:title="@string/settings"
+        />
+
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/dark_them_swithcher"
         android:layout_width="match_parent"
