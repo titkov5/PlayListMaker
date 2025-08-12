@@ -1,7 +1,6 @@
 package com.example.playlistmaker.ui.Search
 
 import android.content.Context.INPUT_METHOD_SERVICE
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,6 +11,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
@@ -59,11 +59,8 @@ class SearchFragment : Fragment()  {
                     viewModel.addTrack(track)
                     val trackAsString = Gson().toJson(track)
                     historyTracksAdapter.notifyDataSetChanged()
-
-                    parentFragmentManager.commit {
-                        replace(R.id.rootFragmentContainerView, PlayerFragment.newInstance(trackAsString))
-                        addToBackStack(null)
-                    }
+                    val fragment = PlayerFragment.newInstance(trackAsString)
+                    findNavController().navigate(R.id.playerFragment2, fragment.arguments)
                 }
             }
         )
@@ -82,10 +79,13 @@ class SearchFragment : Fragment()  {
             emptyList(),
             { track: Track ->
                 val trackAsString = Gson().toJson(track)
-                parentFragmentManager.commit {
-                    replace(R.id.rootFragmentContainerView, PlayerFragment.newInstance(trackAsString))
-                    addToBackStack(null)
-                }
+                val fragment = PlayerFragment.newInstance(trackAsString)
+                findNavController().navigate(R.id.playerFragment2, fragment.arguments)
+
+//                parentFragmentManager.commit {
+//                    replace(R.id.rootFragmentContainerView, PlayerFragment.newInstance(trackAsString))
+//                    addToBackStack(null)
+//                }
             }
         )
 

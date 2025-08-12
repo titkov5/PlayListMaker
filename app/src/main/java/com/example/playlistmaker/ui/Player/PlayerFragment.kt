@@ -7,16 +7,14 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
-import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.models.Track
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
@@ -25,7 +23,12 @@ class PlayerFragment : Fragment() {
     private val viewModel by viewModel<PlayerViewModel>()
 
     private var _binding: FragmentPlayerBinding? = null
-    private val binding get() = _binding!!
+//    private val binding get() = _binding!!
+
+    private val binding: FragmentPlayerBinding
+        get() {
+            return _binding!!
+        }
 
     companion object {
         const val TRACK_KEY = "TRACK_KEY"
@@ -46,7 +49,7 @@ class PlayerFragment : Fragment() {
         binding.apply {
 
             binding.playerToolbar.setOnClickListener {
-                parentFragmentManager.popBackStack()
+                findNavController().popBackStack()
             }
 
             trackMainTitle.text = track.trackName
@@ -74,7 +77,7 @@ class PlayerFragment : Fragment() {
 
         viewModel.prepareMediaPlayer(track.previewUrl)
 
-        viewModel.observePlaybackState().observe(requireActivity()) {
+        viewModel.observePlaybackState().observe(viewLifecycleOwner) {
             when (it) {
                 PlaybackState.Playing -> {
                     binding.apply {
@@ -97,7 +100,7 @@ class PlayerFragment : Fragment() {
             }
         }
 
-        viewModel.observerPlayerPosition().observe(requireActivity()) {
+        viewModel.observerPlayerPosition().observe(viewLifecycleOwner) {
             binding.trackTimeCurrentValue.text = it
         }
 
@@ -117,9 +120,9 @@ class PlayerFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        viewModel.onDestroy()
         super.onDestroyView()
         _binding = null
-        viewModel.onDestroy()
     }
 
     fun dpToPx(dp: Float): Int {
