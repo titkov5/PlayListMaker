@@ -30,7 +30,6 @@
             android:lines="1"
             android:maxLength="15"
             android:inputType="text"
-            android:autofillHints=""
             android:layout_marginTop="@dimen/padding_8"
             android:layout_marginBottom="@dimen/padding_8"
             android:drawableStart="@drawable/search_icon"

@@ -21,22 +21,8 @@ import java.util.Locale
 
 class PlayerFragment : Fragment() {
     private val viewModel by viewModel<PlayerViewModel>()
-
     private var _binding: FragmentPlayerBinding? = null
-//    private val binding get() = _binding!!
-
-    private val binding: FragmentPlayerBinding
-        get() {
-            return _binding!!
-        }
-
-    companion object {
-        const val TRACK_KEY = "TRACK_KEY"
-
-        fun newInstance(trackAsString: String) = PlayerFragment().apply {
-            arguments = bundleOf(TRACK_KEY to trackAsString)
-        }
-    }
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -130,6 +116,14 @@ class PlayerFragment : Fragment() {
             TypedValue.COMPLEX_UNIT_DIP,
             dp,
             requireActivity().applicationContext.resources.displayMetrics).toInt()
+    }
+
+    companion object {
+        const val TRACK_KEY = "TRACK_KEY"
+
+        fun newInstance(trackAsString: String) = PlayerFragment().apply {
+            arguments = bundleOf(TRACK_KEY to trackAsString)
+        }
     }
 }
 

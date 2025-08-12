@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
@@ -76,16 +75,11 @@ class SearchFragment : Fragment()  {
 
     private fun setupHistoryTracksView() {
         historyTracksAdapter = TrackAdapter(
-            emptyList(),
-            { track: Track ->
+            emptyList(), {
+                track: Track ->
                 val trackAsString = Gson().toJson(track)
                 val fragment = PlayerFragment.newInstance(trackAsString)
                 findNavController().navigate(R.id.playerFragment2, fragment.arguments)
-
-//                parentFragmentManager.commit {
-//                    replace(R.id.rootFragmentContainerView, PlayerFragment.newInstance(trackAsString))
-//                    addToBackStack(null)
-//                }
             }
         )
 
@@ -128,7 +122,13 @@ class SearchFragment : Fragment()  {
         viewModel.onCreate()
 
         viewModel.observeState().observe(viewLifecycleOwner) {
-            binding.searchEditText.setText(it.text)
+            binding.apply {
+                if (searchEditText.text.toString() != it.text ) {
+                    searchEditText.setText(it.text)
+                }
+            }
+
+
             render(it.status)
             tracksAdapter.tracks = it.tracks
             tracksAdapter.notifyDataSetChanged()
@@ -148,14 +148,6 @@ class SearchFragment : Fragment()  {
             }
         }
     }
-
-//    private fun setupToolBar() {
-//        val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
-//        toolbar.setNavigationOnClickListener {
-//            val displayIntent = Intent(this, MainActivity::class.java)
-//            startActivity(displayIntent)
-//        }
-//    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
