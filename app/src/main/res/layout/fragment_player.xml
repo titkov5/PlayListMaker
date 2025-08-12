@@ -17,7 +17,8 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/playerToolbar"
         style="@style/ToolbarStyle"
-        app:navigationIcon="@drawable/arrow_back" />
+        app:navigationIcon="@drawable/arrow_back"
+        tools:ignore="MissingConstraints" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/leftBorder"
