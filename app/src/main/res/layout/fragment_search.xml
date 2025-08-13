@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.Search.SearchActivity"
+    tools:context=".ui.Search.SearchFragment"
     android:orientation="vertical"
     style="@style/SecondaryBackground"
     >
@@ -13,7 +13,6 @@
         android:id="@+id/search_toolbar"
         style="@style/ToolbarStyle"
         app:title="@string/search"
-        app:navigationIcon="@drawable/arrow_back"
         />
 
     <FrameLayout
@@ -31,7 +30,6 @@
             android:lines="1"
             android:maxLength="15"
             android:inputType="text"
-            android:autofillHints=""
             android:layout_marginTop="@dimen/padding_8"
             android:layout_marginBottom="@dimen/padding_8"
             android:drawableStart="@drawable/search_icon"

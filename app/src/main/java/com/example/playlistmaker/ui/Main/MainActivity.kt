@@ -1,12 +1,13 @@
 package com.example.playlistmaker.ui.Main
 
-import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityMainBinding
-import com.example.playlistmaker.ui.media.MediaActivity
-import com.example.playlistmaker.ui.Search.SearchActivity
-import com.example.playlistmaker.ui.Settings.SettingsActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -15,23 +16,23 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        binding.settingsButton.setOnClickListener {
-            viewModel.settingsOnClick()
-            val displayIntent = Intent(this, SettingsActivity::class.java)
-            this.startActivity(displayIntent)
-        }
+        setContentView(R.layout.activity_main)
 
-        binding.searchButton.setOnClickListener {
-            viewModel.searchOnClick()
-            val displaySearchIntent = Intent(this, SearchActivity::class.java)
-            this.startActivity(displaySearchIntent)
-        }
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.rootFragmentContainerView) as NavHostFragment
+        val navController = navHostFragment.navController
 
-        binding.libraryButton.setOnClickListener {
-            val displaySearchIntent = Intent(this, MediaActivity::class.java)
-            this.startActivity(displaySearchIntent)
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNavigationView.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.playerFragment2 -> {
+                    bottomNavigationView.visibility = View.GONE
+                }
+                else -> {
+                    bottomNavigationView.visibility = View.VISIBLE
+                }
+            }
         }
     }
 }

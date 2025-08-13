@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.Player.PlayerActivity"
+    tools:context=".ui.Player.PlayerFragment"
     >
 
 <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,7 +17,8 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/playerToolbar"
         style="@style/ToolbarStyle"
-        app:navigationIcon="@drawable/arrow_back" />
+        app:navigationIcon="@drawable/arrow_back"
+        tools:ignore="MissingConstraints" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/leftBorder"
